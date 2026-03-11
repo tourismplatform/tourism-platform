@@ -1,19 +1,30 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockDestinations } from '@/lib/mockData';
+import api from '@/lib/api';
 import DestinationCard from '@/components/DestinationCard';
+
+
 
 const CATEGORIES = ['Tous', 'NATURE', 'CULTURE', 'AVENTURE', 'PLAGE'];
 
 export default function HomePage() {
   const router = useRouter();
   const [search, setSearch] = useState('');
-  const [activecat, setActivecat] = useState('Tous');
+ const [activecat, setActivecat] = useState('Tous');
+const [destinations, setDestinations] = useState<any[]>([]);
+const [loading, setLoading] = useState(true);
 
-  const filtered = mockDestinations
-    .filter(d => activecat === 'Tous' || d.category === activecat)
-    .slice(0, 3);
+useEffect(() => {
+  api.get('/destinations')
+    .then(res => setDestinations(res.data.data))
+    .catch(() => setDestinations([]))
+    .finally(() => setLoading(false));
+}, []);
+
+ const filtered = destinations
+  .filter((d: any) => activecat === 'Tous' || d.category === activecat)
+  .slice(0, 3);
 
   const handleSearch = () => {
     if (search.trim()) router.push(`/destinations?search=${search}`);
