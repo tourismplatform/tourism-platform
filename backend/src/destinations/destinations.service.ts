@@ -73,11 +73,16 @@ export class DestinationsService {
     return { data: null, message: 'Destination supprimée' };
   }
 
-  async addImage(destinationId: string, imageUrl: string, adminId: string) {
+  async addImage(destinationId: string, imageUrl: string, isCover: boolean, adminId: string) {
     const client = this.supabase.getClient();
     const { data, error } = await client
       .from('destination_images')
-      .insert({ destination_id: destinationId, url: imageUrl, uploaded_by: adminId })
+      .insert({
+        destination_id: destinationId,
+        url: imageUrl,
+        is_cover: isCover,
+        uploaded_by: adminId,
+      })
       .select()
       .single();
 

@@ -9,7 +9,7 @@ export class PaymentsService {
     const client = this.supabase.getClient();
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    const transactionId = `MOCK-TXN-${Date.now()}`;
+    const transactionId = `MOCK_TXN_${Math.random().toString(36).substring(7).toUpperCase()}`;
 
     const { data: booking, error: bookingError } = await client
       .from('bookings').select('total_price, user_id').eq('id', bookingId).single();

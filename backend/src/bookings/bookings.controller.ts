@@ -1,7 +1,5 @@
-import {
-  Controller, Post, Get, Put, Body, Param, UseGuards, Request,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Get, Put, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -44,6 +42,7 @@ export class BookingsController {
   }
 
   @ApiOperation({ summary: 'Confirmer ou annuler une réservation (Admin)' })
+  @ApiBody({ schema: { type: 'object', properties: { status: { type: 'string', enum: ['CONFIRMED', 'CANCELLED', 'COMPLETED'], example: 'CONFIRMED' } } } })
   @Put('admin/bookings/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

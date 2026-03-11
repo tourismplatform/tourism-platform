@@ -1,8 +1,5 @@
-import {
-  Controller, Get, Post, Put, Delete,
-  Body, Param, Query, UseGuards, Request,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
 import { DestinationsService } from './destinations.service';
 import { CreateDestinationDto } from './dto/create-destination.dto';
 import { FilterDestinationDto } from './dto/filter-destination.dto';
@@ -57,10 +54,16 @@ export class DestinationsController {
 
   @ApiOperation({ summary: 'Ajouter une image (Admin)' })
   @ApiBearerAuth()
+  @ApiBody({ schema: { type: 'object', properties: { url: { type: 'string', example: 'https://example.com/image.jpg' }, isCover: { type: 'boolean', example: false } } } })
   @Post('admin/destinations/:id/images')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  addImage(@Param('id') id: string, @Body('url') imageUrl: string, @Request() req) {
-    return this.destinationsService.addImage(id, imageUrl, req.user.userId);
+  addImage(
+    @Param('id') id: string,
+    @Body('url') imageUrl: string,
+    @Body('isCover') isCover: boolean = false,
+    @Request() req,
+  ) {
+    return this.destinationsService.addImage(id, imageUrl, isCover, req.user.userId);
   }
 }
