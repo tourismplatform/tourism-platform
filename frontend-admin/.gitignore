@@ -1,0 +1,24 @@
+nano frontend-admin/.gitignore
+```
+
+Colle ce contenu :
+```
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
