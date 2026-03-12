@@ -3,13 +3,18 @@
 export interface Destination {
   id: string;
   name: string;
-  price: number;
-  rating: number;
-  category: 'NATURE' | 'CULTURE' | 'AVENTURE' | 'PLAGE';
+  price?: number;
+  price_per_person?: number;
+  rating?: number;
+  avg_rating?: number;
+  category: 'NATURE' | 'CULTURE' | 'AVENTURE' | 'PLAGE' | 'HISTORY';
   location: string;
-  cover_image: string;
+  cover_image?: string;
   description?: string;
   images?: string[];
+  status?: string;
+  capacity?: number;
+  created_at?: string;
 }
 
 export interface User {

@@ -1,4 +1,0 @@
-[00:00:12.216] Server  LOG     ✓ Ready in 7.5s
-[00:03:23.829] Server  ERROR   Error: ENOENT: no such file or directory, scandir '/home/nana-marc/tourism-platform/frontend-touriste/src/app'
-[00:03:23.859] Server  ERROR   ⨯ "unhandledRejection:" Error: ENOENT: no such file or directory, scandir '/home/nana-marc/tourism-platform/frontend-touriste/src/app'
-[00:03:23.887] Server  ERROR   ⨯ "unhandledRejection: " Error: ENOENT: no such file or directory, scandir '/home/nana-marc/tourism-platform/frontend-touriste/src/app'

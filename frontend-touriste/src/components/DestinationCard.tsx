@@ -59,10 +59,10 @@ export default function DestinationCard({ destination, onClick }: Props) {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, color: '#1a4fd6', fontSize: '0.95rem' }}>
-            {destination.price.toLocaleString()} FCFA <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 400 }}>/pers.</span>
+           {(destination.price || destination.price_per_person)?.toLocaleString()} FCFA<span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 400 }}>/pers.</span>
           </span>
           <span style={{ background: '#fff8e7', color: '#d97706', padding: '3px 8px', borderRadius: 6, fontSize: '0.78rem', fontWeight: 700 }}>
-            ⭐ {destination.rating}
+            ⭐  {destination.rating || destination.avg_rating || 0}
           </span>
         </div>
       </div>
