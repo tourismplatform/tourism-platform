@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
 import { DestinationsService } from './destinations.service';
 import { CreateDestinationDto } from './dto/create-destination.dto';
@@ -7,11 +8,15 @@ import { UpdateDestinationDto } from './dto/update-destination.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { SupabaseService } from '../supabase.service';
 
 @ApiTags('Destinations')
 @Controller()
 export class DestinationsController {
-  constructor(private destinationsService: DestinationsService) {}
+  constructor(
+    private destinationsService: DestinationsService,
+    private supabase: SupabaseService,
+  ) {}
 
   @ApiOperation({ summary: 'Lister les destinations avec filtres' })
   @Get('destinations')
@@ -34,13 +39,11 @@ export class DestinationsController {
     return this.destinationsService.create(dto, req.user.userId);
   }
 
-  @ApiOperation({ summary: 'Modifier une destination (Admin)' })
-  @ApiBearerAuth()
   @Put('admin/destinations/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body() dto: UpdateDestinationDto) {
-    return this.destinationsService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateDestinationDto, @Request() req) {
+    return this.destinationsService.update(id, dto, req.user.userId);
   }
 
   @ApiOperation({ summary: 'Supprimer une destination (Admin)' })
@@ -65,5 +68,38 @@ export class DestinationsController {
     @Request() req,
   ) {
     return this.destinationsService.addImage(id, imageUrl, isCover, req.user.userId);
+  }
+
+  @ApiOperation({ summary: 'Uploader une image sur Supabase Storage (Admin)' })
+  @ApiBearerAuth()
+  @Post('upload')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadFile(@UploadedFile() file: any) {
+    if (!file) {
+      throw new BadRequestException('Image manquante');
+    }
+
+    const client = this.supabase.getClient();
+    const fileName = `${Date.now()}-${file.originalname.replace(/\s/g, '_')}`;
+    const filePath = `destinations/${fileName}`;
+
+    const { data, error } = await client.storage
+      .from('destinations')
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true,
+      });
+
+    if (error) {
+      throw new BadRequestException(`Erreur Supabase: ${error.message}`);
+    }
+
+    const { data: { publicUrl } } = client.storage
+      .from('destinations')
+      .getPublicUrl(filePath);
+
+    return { url: publicUrl, message: 'Upload réussi' };
   }
 }

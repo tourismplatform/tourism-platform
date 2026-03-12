@@ -8,6 +8,15 @@ import { UpdateDestinationDto } from './dto/update-destination.dto';
 export class DestinationsService {
   constructor(private supabase: SupabaseService) {}
 
+  private _transformDestination(dest: any) {
+    if (!dest) return null;
+    const { destination_images, ...rest } = dest;
+    return {
+      ...rest,
+      images: destination_images?.map(img => img.url) || []
+    };
+  }
+
   async findAll(filters: FilterDestinationDto) {
     const client = this.supabase.getClient();
     let query = client
@@ -23,7 +32,8 @@ export class DestinationsService {
     const { data, error } = await query;
     if (error) throw new Error(error.message);
 
-    return { data, message: 'Destinations récupérées' };
+    const transformed = data.map(dest => this._transformDestination(dest));
+    return { data: transformed, message: 'Destinations récupérées' };
   }
 
   async findOne(id: string) {
@@ -35,7 +45,7 @@ export class DestinationsService {
       .single();
 
     if (error || !data) throw new NotFoundException('Destination non trouvée');
-    return { data, message: 'Destination récupérée' };
+    return { data: this._transformDestination(data), message: 'Destination récupérée' };
   }
 
   async create(dto: CreateDestinationDto, adminId: string) {
@@ -52,36 +62,62 @@ export class DestinationsService {
 
     // Si on a des images, les insérer
     if (images && images.length > 0) {
+      console.log(`[Create] Insertion de ${images.length} images pour la destination ${dest.id}`);
       const imageInserts = images.map(url => ({
         destination_id: dest.id,
         url: url,
-        uploaded_by: adminId,
         is_cover: false
       }));
-      await client.from('destination_images').insert(imageInserts);
+      
+      const { error: imgError } = await client.from('destination_images').insert(imageInserts);
+      if (imgError) {
+        console.error('[Create] Erreur insertion images:', imgError);
+        // On ne bloque pas forcément la création de la destination si les images échouent, 
+        // mais ici on veut savoir pourquoi ça échoue.
+        throw new Error(`Erreur images: ${imgError.message}`);
+      }
     }
 
-    return { data: dest, message: 'Destination créée' };
+    return this.findOne(dest.id);
   }
 
-  async update(id: string, dto: UpdateDestinationDto) {
+  async update(id: string, dto: UpdateDestinationDto, adminId: string) {
     const client = this.supabase.getClient();
     const { images, ...destData } = dto;
 
-    const { data, error } = await client
+    const { error } = await client
       .from('destinations')
       .update(destData)
-      .eq('id', id)
-      .select()
-      .single();
+      .eq('id', id);
 
     if (error) throw new Error(error.message);
 
-    // Gestion simple des images lors de l'update : on peut ajouter de nouvelles images 
-    // ou tout remplacer selon le besoin. Ici, on va juste mettre à jour les infos de base.
-    // L'ajout d'image spécifique utilise déjà addImage().
+    // Synchronisation des images
+    if (images) {
+      const { data: existingImages } = await client
+        .from('destination_images')
+        .select('url')
+        .eq('destination_id', id);
+      
+      const existingUrls = existingImages?.map(img => img.url) || [];
+      const newImages = images.filter(url => !existingUrls.includes(url));
+
+      if (newImages.length > 0) {
+        console.log(`[Update] Insertion de ${newImages.length} nouvelles images pour ${id}`);
+        const imageInserts = newImages.map(url => ({
+          destination_id: id,
+          url: url,
+          is_cover: false
+        }));
+        const { error: imgError } = await client.from('destination_images').insert(imageInserts);
+        if (imgError) {
+          console.error('[Update] Erreur insertion images:', imgError);
+          throw new Error(`Erreur images: ${imgError.message}`);
+        }
+      }
+    }
     
-    return { data, message: 'Destination modifiée' };
+    return this.findOne(id);
   }
 
   async remove(id: string) {
@@ -103,7 +139,6 @@ export class DestinationsService {
         destination_id: destinationId,
         url: imageUrl,
         is_cover: isCover,
-        uploaded_by: adminId,
       })
       .select()
       .single();

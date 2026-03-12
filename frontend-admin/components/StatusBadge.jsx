@@ -4,6 +4,9 @@ const CONFIG = {
   pending:   { label:"En attente", bg:"var(--yellow-l)", color:"var(--yellow)", dot:"#ca8a04" },
   confirmed: { label:"Confirmée",  bg:"var(--green-l)",  color:"var(--green)",  dot:"#16a34a" },
   cancelled: { label:"Annulée",    bg:"var(--red-l)",    color:"var(--red)",    dot:"#dc2626" },
+  PENDING:   { label:"En attente", bg:"var(--yellow-l)", color:"var(--yellow)", dot:"#ca8a04" },
+  CONFIRMED: { label:"Confirmée",  bg:"var(--green-l)",  color:"var(--green)",  dot:"#16a34a" },
+  CANCELLED: { label:"Annulée",    bg:"var(--red-l)",    color:"var(--red)",    dot:"#dc2626" },
 };
 
 export default function StatusBadge({ status }) {

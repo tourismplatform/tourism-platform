@@ -36,7 +36,11 @@ export default function DestinationCard({ destination, onClick }: Props) {
     >
       {/* IMAGE / ICÔNE */}
       <div style={{ height: 200, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', position: 'relative' }}>
-        {icon}
+        {destination.images && destination.images.length > 0 ? (
+          <img src={destination.images[0]} alt={destination.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          icon
+        )}
         {/* Badge catégorie */}
         <span style={{ position: 'absolute', top: 12, left: 12, background: '#ff5722', color: 'white', fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px', borderRadius: 20, letterSpacing: '0.5px' }}>
           {destination.category}

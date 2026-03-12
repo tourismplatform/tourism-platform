@@ -27,8 +27,9 @@ export class PaymentsService {
       .select().single();
 
     if (error) throw new Error(error.message);
-
-    await client.from('bookings').update({ status: 'CONFIRMED' }).eq('id', bookingId);
+    
+    // NOTE: Manual confirmation by Admin is now required. 
+    // We don't update status to CONFIRMED here anymore.
 
     return { data: { payment, transactionId }, message: 'Paiement effectué avec succès' };
   }

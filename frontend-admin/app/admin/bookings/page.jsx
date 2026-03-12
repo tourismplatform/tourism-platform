@@ -28,7 +28,7 @@ export default function AdminBookings() {
   const handleAction = async () => {
     try {
       await bookingsAPI.updateStatus(modal.id, { status: modal.action });
-      showToast(modal.action === "confirmed" ? "✅ Réservation confirmée !" : "❌ Réservation annulée.");
+      showToast(modal.action === "CONFIRMED" ? "✅ Réservation confirmée !" : "❌ Réservation annulée.");
       setModal({ open:false, id:null, action:null });
       load();
     } catch(e) { alert("Erreur : " + e.message); }
@@ -36,9 +36,9 @@ export default function AdminBookings() {
 
   const counts = {
     all:       bookings.length,
-    pending:   bookings.filter(b => b.status === "pending").length,
-    confirmed: bookings.filter(b => b.status === "confirmed").length,
-    cancelled: bookings.filter(b => b.status === "cancelled").length,
+    PENDING:   bookings.filter(b => b.status === "PENDING").length,
+    CONFIRMED: bookings.filter(b => b.status === "CONFIRMED").length,
+    CANCELLED: bookings.filter(b => b.status === "CANCELLED").length,
   };
 
   const filtered = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
@@ -69,7 +69,7 @@ export default function AdminBookings() {
 
       {/* Filtres */}
       <div style={{ display:"flex", gap:8, marginBottom:24, flexWrap:"wrap" }}>
-        {[["all","Toutes"], ["pending","En attente"], ["confirmed","Confirmées"], ["cancelled","Annulées"]].map(([val, label]) => (
+        {[["all","Toutes"], ["PENDING","En attente"], ["CONFIRMED","Confirmées"], ["CANCELLED","Annulées"]].map(([val, label]) => (
           <button key={val} onClick={() => setFilter(val)} style={{
             background: filter===val ? "var(--blue-600)" : "var(--white)",
             color:      filter===val ? "var(--white)"    : "var(--gray-600)",
@@ -110,13 +110,13 @@ export default function AdminBookings() {
                 <td className="td"><StatusBadge status={b.status} /></td>
                 <td className="td">
                   <div style={{ display:"flex", gap:6 }}>
-                    {b.status !== "confirmed" && (
-                      <button onClick={() => setModal({ open:true, id:b._id, action:"confirmed" })} style={{ background:"var(--green-l)", color:"var(--green)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+                    {b.status !== "CONFIRMED" && (
+                      <button onClick={() => setModal({ open:true, id:b.id, action:"CONFIRMED" })} style={{ background:"var(--green-l)", color:"var(--green)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
                         ✓ Confirmer
                       </button>
                     )}
-                    {b.status !== "cancelled" && (
-                      <button onClick={() => setModal({ open:true, id:b._id, action:"cancelled" })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+                    {b.status !== "CANCELLED" && (
+                      <button onClick={() => setModal({ open:true, id:b.id, action:"CANCELLED" })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
                         ✕ Annuler
                       </button>
                     )}
@@ -130,10 +130,10 @@ export default function AdminBookings() {
 
       <ConfirmModal
         isOpen={modal.open}
-        title={modal.action === "confirmed" ? "Confirmer cette réservation ?" : "Annuler cette réservation ?"}
+        title={modal.action === "CONFIRMED" ? "Confirmer cette réservation ?" : "Annuler cette réservation ?"}
         message="Le touriste sera notifié par email."
-        confirmLabel={modal.action === "confirmed" ? "✓ Oui, confirmer" : "✕ Oui, annuler"}
-        confirmColor={modal.action === "confirmed" ? "var(--green)" : "var(--red)"}
+        confirmLabel={modal.action === "CONFIRMED" ? "✓ Oui, confirmer" : "✕ Oui, annuler"}
+        confirmColor={modal.action === "CONFIRMED" ? "var(--green)" : "var(--red)"}
         onConfirm={handleAction}
         onCancel={() => setModal({ open:false, id:null, action:null })}
       />

@@ -156,12 +156,14 @@ export default function BookingPage() {
         {/* ÉTAPE 3 — Confirmation */}
         {step === 3 && (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: '4rem', marginBottom: 16 }}>✅</div>
-            <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, color: '#00875a', marginBottom: 8 }}>
-              Réservation confirmée !
+            <div style={{ fontSize: '4rem', marginBottom: 16 }}>📩</div>
+            <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, color: '#1a4fd6', marginBottom: 8 }}>
+              Demande envoyée !
             </h2>
-            <p style={{ color: '#6b7280', marginBottom: 8 }}>Votre réservation a été enregistrée avec succès.</p>
-            <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: 32 }}>N° de transaction : <strong>#{txn}</strong></p>
+            <p style={{ color: '#6b7280', marginBottom: 8, fontSize: '0.95rem' }}>Votre paiement a été reçu avec succès.</p>
+            <p style={{ color: '#0a0f1e', marginBottom: 8, fontWeight: 600, fontSize: '0.9rem' }}>Un administrateur va maintenant valider votre réservation d'ici peu.</p>
+            <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 32 }}>Consultez la rubrique "Mes Réservations" pour suivre l'état de votre demande.</p>
+            <p style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 24 }}>N° de transaction : <strong>#{txn}</strong></p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button onClick={() => router.push('/my-bookings')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
                 Voir mes réservations

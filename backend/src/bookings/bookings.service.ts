@@ -72,6 +72,7 @@ export class BookingsService {
     const totalPrice =
       (dest.price_per_person as number) * dto.nb_persons * (nights || 1);
 
+    console.log(`[Booking] Création réservation pour utilisateur ${userId}, statut initial: PENDING`);
     const { data, error } = await client
       .from('bookings')
       .insert({
@@ -126,11 +127,11 @@ export class BookingsService {
     return { data, message: 'Toutes les réservations récupérées' };
   }
 
-  // ─── Admin : confirmer ou annuler ──────────────────────────────────
   async updateStatus(
     id: string,
     status: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED',
   ) {
+    console.log(`[Admin] Mise à jour réservation ${id} vers ${status}`);
     const client = this.supabase.getClient();
     const { data, error } = await client
       .from('bookings')
@@ -139,7 +140,12 @@ export class BookingsService {
       .select()
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error(`[Admin] Erreur mise à jour statut:`, error);
+      throw new Error(error.message);
+    }
+    
+    console.log(`[Admin] Succès mise à jour ${id}`);
     return { data, message: `Réservation ${status.toLowerCase()}` };
   }
 }

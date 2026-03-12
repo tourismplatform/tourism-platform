@@ -61,6 +61,10 @@ export default function AdminDestinations() {
     setShowForm(true);
   };
 
+  const removeImg = (url) => {
+    setForm(f => ({ ...f, images: f.images.filter(i => i !== url) }));
+  };
+
   const handleSave = async () => {
     if (!form.name || !form.location || !form.price_per_person)
       return alert("Nom, lieu et prix sont obligatoires.");
@@ -228,11 +232,26 @@ export default function AdminDestinations() {
             </div>
 
             <div style={{ marginBottom:20 }}>
-              <label className="label">Photo</label>
-              <label style={{ display:"inline-block", padding:"9px 18px", background:"var(--blue-50)", border:"1.5px dashed var(--blue-400)", borderRadius:10, cursor:"pointer", fontSize:13, color:"var(--blue-700)", fontWeight:600 }}>
-                {uploading ? "⏳ Upload en cours..." : "📷 Ajouter une photo"}
-                <input type="file" accept="image/*" onChange={handleUpload} style={{ display:"none" }} />
-              </label>
+              <label className="label">Photos ({form.images.length})</label>
+              
+              {/* Galerie d'aperçu */}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(80px, 1fr))", gap:8, marginBottom:12 }}>
+                {form.images.map((url, i) => (
+                  <div key={i} style={{ position:"relative", aspectRatio:"1/1", borderRadius:8, overflow:"hidden", border:"1px solid var(--gray-200)" }}>
+                    <img src={url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <button 
+                      onClick={() => removeImg(url)}
+                      style={{ position:"absolute", top:2, right:2, width:20, height:20, borderRadius:"50%", background:"rgba(255,0,0,0.8)", color:"white", border:"none", cursor:"pointer", fontSize:10, display:"flex", alignItems:"center", justifyContent:"center" }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <label style={{ display:"flex", alignItems:"center", justifyContent:"center", background:"var(--blue-50)", border:"1.5px dashed var(--blue-400)", borderRadius:10, cursor:"pointer", aspectRatio:"1/1", transition:"all 0.2s" }}>
+                  <span style={{ fontSize:20, color:"var(--blue-700)" }}>{uploading ? "⏳" : "+"}</span>
+                  <input type="file" accept="image/*" onChange={handleUpload} style={{ display:"none" }} disabled={uploading} />
+                </label>
+              </div>
             </div>
 
             <div style={{ display:"flex", gap:10 }}>

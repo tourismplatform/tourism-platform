@@ -25,10 +25,17 @@ export default function DestinationDetailPage() {
   const [startDate, setStartDate] = useState(tomorrow.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(after.toISOString().split('T')[0]);
   const [persons, setPersons] = useState(1);
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
 
   useEffect(() => {
     api.get(`/destinations/${id}`)
-      .then(res => setDestination(res.data.data))
+      .then(res => {
+        const data = res.data.data;
+        setDestination(data);
+        if (data.images && data.images.length > 0) {
+          setSelectedImg(data.images[0]);
+        }
+      })
       .catch(() => setDestination(null));
     api.get(`/reviews/${id}`)
       .then(res => setReviews(res.data.data))
@@ -61,17 +68,38 @@ export default function DestinationDetailPage() {
         <div>
           {/* Galerie */}
           <div style={{ borderRadius: 16, overflow: 'hidden', background: color, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '6rem', marginBottom: 12, position: 'relative' }}>
-            {icon}
+            {selectedImg ? (
+              <img src={selectedImg} alt={destination.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : destination.images && destination.images.length > 0 ? (
+              <img src={destination.images[0]} alt={destination.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              icon
+            )}
           </div>
 
           {/* Miniatures */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-            {[color, 'linear-gradient(135deg, #ff5722, #f59e0b)', 'linear-gradient(135deg, #8b5cf6, #ec4899)', 'rgba(55,65,81,1)'].map((c, i) => (
-              <div key={i} style={{ flex: 1, height: 70, borderRadius: 8, cursor: 'pointer', border: i === 0 ? '2px solid #1a4fd6' : '2px solid transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', background: c, fontSize: '1.5rem', color: 'white' }}>
-                {i === 3 ? <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>+4</span> : icon}
-              </div>
-            ))}
-          </div>
+          {destination.images && destination.images.length > 1 && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
+              {destination.images.map((img, i) => (
+                <div 
+                  key={i} 
+                  onClick={() => setSelectedImg(img)}
+                  style={{ 
+                    width: 80, 
+                    height: 70, 
+                    borderRadius: 8, 
+                    cursor: 'pointer', 
+                    border: selectedImg === img ? '2px solid #1a4fd6' : '2px solid transparent', 
+                    flexShrink: 0, 
+                    overflow: 'hidden',
+                    transition: 'all 0.2s',
+                    opacity: selectedImg === img ? 1 : 0.7
+                  }}>
+                  <img src={img} alt={`${destination.name} ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Infos */}
           <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.2rem', fontWeight: 700, marginBottom: 10, color: '#0a0f1e' }}>
