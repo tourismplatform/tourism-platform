@@ -10,8 +10,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     Promise.all([adminAPI.getStats(), bookingsAPI.getAll()])
       .then(([s, b]) => {
-        setStats(s);
-        setBookings((b.bookings || b).slice(0, 5));
+        setStats(s.data || s);
+        const bookingList = b.data || b.bookings || (Array.isArray(b) ? b : []);
+        setBookings(bookingList.slice(0, 5));
       })
       .catch(() => {});
   }, []);
@@ -19,8 +20,8 @@ export default function AdminDashboard() {
   const cards = [
     { icon:"🗺️", label:"Destinations",         value: stats?.destinations    ?? "—", light:"var(--blue-50)"  },
     { icon:"📅", label:"Rés. en attente",       value: stats?.pendingBookings ?? "—", light:"#fef9c3"         },
-    { icon:"💰", label:"Revenus du mois",       value: stats?.monthlyRevenue  ? Number(stats.monthlyRevenue).toLocaleString("fr-FR") + " FCFA" : "—", light:"var(--green-l)" },
-    { icon:"👥", label:"Nouveaux utilisateurs", value: stats?.newUsers        ?? "—", light:"#f3e8ff"         },
+    { icon:"💰", label:"Revenus",               value: stats?.revenue         ? Number(stats.revenue).toLocaleString("fr-FR") + " FCFA" : "—", light:"var(--green-l)" },
+    { icon:"👥", label:"Utilisateurs",          value: stats?.users           ?? "—", light:"#f3e8ff"         },
   ];
 
   return (
@@ -68,11 +69,11 @@ export default function AdminDashboard() {
             {bookings.length === 0 ? (
               <tr><td colSpan={5} style={{ padding:32, textAlign:"center", color:"var(--gray-400)" }}>Aucune réservation.</td></tr>
             ) : bookings.map((b, i) => (
-              <tr key={b._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
-                <td className="td" style={{ fontWeight:700 }}>{b.userId?.name || "—"}</td>
-                <td className="td" style={{ color:"var(--gray-600)" }}>{b.destinationId?.name || "—"}</td>
-                <td className="td" style={{ color:"var(--gray-600)" }}>{new Date(b.dates?.start || b.date).toLocaleDateString("fr-FR")}</td>
-                <td className="td" style={{ fontWeight:700, textAlign:"center" }}>{b.persons}</td>
+              <tr key={b.id || b._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
+                <td className="td" style={{ fontWeight:700 }}>{b.users?.name || "—"}</td>
+                <td className="td" style={{ color:"var(--gray-600)" }}>{b.destinations?.name || "—"}</td>
+                <td className="td" style={{ color:"var(--gray-600)" }}>{new Date(b.check_in || b.date).toLocaleDateString("fr-FR")}</td>
+                <td className="td" style={{ fontWeight:700, textAlign:"center" }}>{b.nb_persons || b.persons}</td>
                 <td className="td"><StatusBadge status={b.status} /></td>
               </tr>
             ))}

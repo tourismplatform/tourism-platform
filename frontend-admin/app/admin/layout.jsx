@@ -56,7 +56,7 @@ export default function AdminLayout({ children }) {
               <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>Admin</div>
             </div>
           </div>
-          <button onClick={() => { if(logout) logout(); router.push("/"); }} style={{ width:"100%", padding:"8px", borderRadius:8, fontSize:12, fontWeight:600, background:"rgba(220,38,38,0.15)", border:"1px solid rgba(220,38,38,0.3)", color:"#fca5a5", cursor:"pointer", fontFamily:"var(--font-body)" }}>
+          <button onClick={() => { if(logout) logout(); window.location.href = "http://localhost:3000"; }} style={{ width:"100%", padding:"8px", borderRadius:8, fontSize:12, fontWeight:600, background:"rgba(220,38,38,0.15)", border:"1px solid rgba(220,38,38,0.3)", color:"#fca5a5", cursor:"pointer", fontFamily:"var(--font-body)" }}>
             🚪 Se déconnecter
           </button>
         </div>

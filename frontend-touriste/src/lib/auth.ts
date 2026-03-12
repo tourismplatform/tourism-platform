@@ -10,18 +10,32 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token: Cookies.get('token') || null,
-  isAuthenticated: false, // ← CORRIGÉ : false par défaut
+const getInitialUser = () => {
+  try {
+    const u = Cookies.get('user');
+    return u ? JSON.parse(u) : null;
+  } catch { return null; }
+};
 
-  login: (user, token) => {
-    Cookies.set('token', token, { expires: 7 }); // expire dans 7 jours
-    set({ user, token, isAuthenticated: true });
-  },
+export const useAuthStore = create<AuthState>((set) => {
+  const token = Cookies.get('token') || null;
+  const user = getInitialUser();
 
-  logout: () => {
-    Cookies.remove('token');
-    set({ user: null, token: null, isAuthenticated: false });
-  },
-}));
+  return {
+    user,
+    token,
+    isAuthenticated: !!token && !!user,
+
+    login: (user, token) => {
+      Cookies.set('token', token, { expires: 7 }); 
+      Cookies.set('user', JSON.stringify(user), { expires: 7 });
+      set({ user, token, isAuthenticated: true });
+    },
+
+    logout: () => {
+      Cookies.remove('token');
+      Cookies.remove('user');
+      set({ user: null, token: null, isAuthenticated: false });
+    },
+  };
+});

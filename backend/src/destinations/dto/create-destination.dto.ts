@@ -35,4 +35,8 @@ export class CreateDestinationDto {
   @ApiProperty({ example: 50 })
   @IsNumber()
   capacity: number;
+
+  @ApiProperty({ type: [String], required: false })
+  @IsString({ each: true })
+  images?: string[];
 }

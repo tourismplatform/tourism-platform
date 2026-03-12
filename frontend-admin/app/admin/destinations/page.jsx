@@ -20,8 +20,8 @@ function getImg(name, images) {
   return REAL_IMAGES[name] || "https://images.unsplash.com/photo-1580746738099-1b1d621a3404?w=640&q=80";
 }
 
-const CATS  = ["Nature","Culture","Safari","Aventure","Gastronomie","Artisanat"];
-const empty = { name:"", description:"", location:"", category:"Nature", price:"", capacity:"", images:[] };
+const CATS  = ["NATURE", "HISTORY", "BEACH", "CIRCUIT"];
+const empty = { name:"", description:"", location:"", category:"NATURE", price_per_person:"", capacity:"", images:[] };
 
 export default function AdminDestinations() {
   
@@ -39,30 +39,48 @@ export default function AdminDestinations() {
 
   const load = () => {
     destinationsAPI.getAll()
-      .then(d => { setDests(d.destinations || d); setLoading(false); })
+      .then(d => { 
+        setDests(d.data || d.destinations || (Array.isArray(d) ? d : [])); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   };
   useEffect(load, []);
 
   const openEdit = (d) => {
-    setForm({ name:d.name, description:d.description, location:d.location, category:d.category, price:d.price, capacity:d.capacity, images:d.images||[] });
-    setEditing(d._id);
+    setForm({ 
+      name: d.name, 
+      description: d.description, 
+      location: d.location, 
+      category: d.category, 
+      price_per_person: d.price_per_person || d.price, 
+      capacity: d.capacity, 
+      images: d.images || [] 
+    });
+    setEditing(d.id || d._id);
     setShowForm(true);
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.location || !form.price)
+    if (!form.name || !form.location || !form.price_per_person)
       return alert("Nom, lieu et prix sont obligatoires.");
     setSaving(true);
     try {
-      const payload = { ...form };
+      const payload = { 
+        ...form,
+        price_per_person: Number(form.price_per_person),
+        capacity: Number(form.capacity || 0)
+      };
+      
       if (!payload.images || payload.images.length === 0) {
         const ri = REAL_IMAGES[form.name];
         if (ri) payload.images = [ri];
       }
+      
       editing
         ? await destinationsAPI.update(editing, payload)
         : await destinationsAPI.create(payload);
+        
       showToast(editing ? "✅ Mise à jour !" : "✅ Destination créée !");
       setShowForm(false);
       load();
@@ -135,7 +153,7 @@ export default function AdminDestinations() {
             {dests.length === 0 ? (
               <tr><td colSpan={4} style={{ padding:40, textAlign:"center", color:"var(--gray-400)" }}>Aucune destination.</td></tr>
             ) : dests.map((d, i) => (
-              <tr key={d._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
+              <tr key={d.id || d._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
                 <td className="td">
                   <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                     <img
@@ -156,14 +174,14 @@ export default function AdminDestinations() {
                   </span>
                 </td>
                 <td className="td" style={{ fontWeight:700, color:"var(--blue-700)" }}>
-                  {d.price > 0 ? Number(d.price).toLocaleString("fr-FR") + " FCFA" : "Gratuit"}
+                  {d.price_per_person > 0 ? Number(d.price_per_person).toLocaleString("fr-FR") + " FCFA" : "Gratuit"}
                 </td>
                 <td className="td">
                   <div style={{ display:"flex", gap:8 }}>
                     <button onClick={() => openEdit(d)} style={{ background:"var(--blue-50)", color:"var(--blue-700)", border:"none", borderRadius:8, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
                       ✏️ Modifier
                     </button>
-                    <button onClick={() => setDelModal({ open:true, id:d._id })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+                    <button onClick={() => setDelModal({ open:true, id:d.id || d._id })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
                       🗑 Supprimer
                     </button>
                   </div>
@@ -186,10 +204,10 @@ export default function AdminDestinations() {
             </div>
 
             {[
-              ["Nom *",          "text",   "name",     "Ex: Cascades de Karfiguéla"],
-              ["Localisation *", "text",   "location", "Ex: Banfora, Cascades"],
-              ["Prix (FCFA) *",  "number", "price",    "Ex: 15000"],
-              ["Capacité max",   "number", "capacity", "Ex: 50"],
+              ["Nom *",          "text",   "name",             "Ex: Cascades de Karfiguéla"],
+              ["Localisation *", "text",   "location",         "Ex: Banfora, Cascades"],
+              ["Prix (FCFA) *",  "number", "price_per_person", "Ex: 15000"],
+              ["Capacité max",   "number", "capacity",         "Ex: 50"],
             ].map(([label, type, key, ph]) => (
               <div key={key} style={{ marginBottom:16 }}>
                 <label className="label">{label}</label>

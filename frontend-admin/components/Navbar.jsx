@@ -8,9 +8,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const router   = useRouter();
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname === "/" || pathname?.startsWith("/admin")) return null;
 
-  const handleLogout = () => { logout(); router.push("/"); };
+  const handleLogout = () => { logout(); window.location.href = "http://localhost:3000"; };
 
   return (
     <nav style={{

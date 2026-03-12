@@ -56,7 +56,7 @@ useEffect(() => {
           </p>
 
           {/* Barre de recherche */}
-          <div style={{ background: 'white', borderRadius: 14, padding: '8px 8px 8px 20px', display: 'flex', alignItems: 'center', gap: 10, maxWidth: 560, boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}>
+          <div suppressHydrationWarning style={{ background: 'white', borderRadius: 14, padding: '8px 8px 8px 20px', display: 'flex', alignItems: 'center', gap: 10, maxWidth: 560, boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}>
             <input
               type="text"
               value={search}

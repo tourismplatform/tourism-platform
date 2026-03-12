@@ -1,7 +1,8 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { mockBookings } from '@/lib/mockData';
 import { useAuthStore } from '@/lib/auth';
+import api from '@/lib/api';
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   CONFIRMED: { bg: '#d1fae5', color: '#065f46', label: 'Confirmé' },
@@ -13,6 +14,16 @@ const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }
 export default function MyBookingsPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api.get('/bookings/my')
+      .then(res => setBookings(res.data.data))
+      .catch(() => setBookings([]))
+      .finally(() => setLoading(false));
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
@@ -25,12 +36,14 @@ export default function MyBookingsPage() {
     );
   }
 
+  if (loading) return <div style={{ textAlign: 'center', padding: 80 }}>Chargement...</div>;
+
   return (
     <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 24px' }}>
       <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 8, color: '#0a0f1e' }}>Mes Réservations</h1>
       <p style={{ color: '#6b7280', marginBottom: 32, fontSize: '0.9rem' }}>Bonjour {user?.name} 👋</p>
 
-      {mockBookings.length === 0 ? (
+      {bookings.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 60, background: 'white', borderRadius: 14 }}>
           <div style={{ fontSize: '3rem', marginBottom: 16 }}>📋</div>
           <p style={{ color: '#6b7280' }}>Vous n'avez pas encore de réservations.</p>
@@ -40,7 +53,7 @@ export default function MyBookingsPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {mockBookings.map(booking => {
+          {bookings.map(booking => {
             const status = STATUS_STYLES[booking.status] || STATUS_STYLES.PENDING;
             return (
               <div key={booking.id} style={{ background: 'white', borderRadius: 14, padding: 24, boxShadow: '0 4px 24px rgba(10,15,30,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -49,7 +62,7 @@ export default function MyBookingsPage() {
                     {booking.destination?.name || 'Destination'}
                   </div>
                   <div style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: 6 }}>
-                    📅 {new Date(booking.start_date).toLocaleDateString('fr-FR')} → {new Date(booking.end_date).toLocaleDateString('fr-FR')}
+                    📅 {new Date(booking.check_in).toLocaleDateString('fr-FR')} → {new Date(booking.check_out).toLocaleDateString('fr-FR')}
                   </div>
                   <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>
                     👥 {booking.nb_persons} personne(s) · 💰 {booking.total_price.toLocaleString()} FCFA

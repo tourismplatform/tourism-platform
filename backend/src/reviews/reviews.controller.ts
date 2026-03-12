@@ -24,6 +24,15 @@ export class ReviewsController {
   findByDestination(@Param('destId') destId: string) {
     return this.reviewsService.findByDestination(destId);
   }
+  
+  @ApiOperation({ summary: 'Tous les avis (Admin)' })
+  @ApiBearerAuth()
+  @Get('admin/reviews')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  findAll() {
+    return this.reviewsService.findAll();
+  }
 
   @ApiOperation({ summary: 'Supprimer un avis (Admin)' })
   @ApiBearerAuth()

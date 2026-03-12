@@ -17,7 +17,10 @@ export default function AdminBookings() {
 
   const load = () => {
     bookingsAPI.getAll()
-      .then(d => { setBookings(d.bookings || d); setLoading(false); })
+      .then(d => { 
+        setBookings(d.data || d.bookings || (Array.isArray(d) ? d : [])); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   };
   useEffect(load, []);
@@ -93,16 +96,16 @@ export default function AdminBookings() {
             {filtered.length === 0 ? (
               <tr><td colSpan={7} style={{ padding:40, textAlign:"center", color:"var(--gray-400)" }}>Aucune réservation trouvée.</td></tr>
             ) : filtered.map((b, i) => (
-              <tr key={b._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
+              <tr key={b.id || b._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
                 <td className="td">
-                  <div style={{ fontWeight:700, color:"var(--gray-900)" }}>{b.userId?.name || "—"}</div>
-                  <div style={{ fontSize:11, color:"var(--gray-400)" }}>{b.userId?.email}</div>
+                  <div style={{ fontWeight:700, color:"var(--gray-900)" }}>{b.users?.name || "—"}</div>
+                  <div style={{ fontSize:11, color:"var(--gray-400)" }}>{b.users?.email}</div>
                 </td>
-                <td className="td" style={{ color:"var(--gray-600)", fontSize:13 }}>{b.destinationId?.name || "—"}</td>
-                <td className="td" style={{ color:"var(--gray-600)", fontSize:13 }}>{new Date(b.dates?.start || b.date).toLocaleDateString("fr-FR")}</td>
-                <td className="td" style={{ fontWeight:700, textAlign:"center" }}>{b.persons}</td>
+                <td className="td" style={{ color:"var(--gray-600)", fontSize:13 }}>{b.destinations?.name || "—"}</td>
+                <td className="td" style={{ color:"var(--gray-600)", fontSize:13 }}>{new Date(b.check_in || b.date).toLocaleDateString("fr-FR")}</td>
+                <td className="td" style={{ fontWeight:700, textAlign:"center" }}>{b.nb_persons || b.persons}</td>
                 <td className="td" style={{ fontWeight:700, color:"var(--blue-700)", fontSize:13 }}>
-                  {Number(b.totalPrice || 0).toLocaleString("fr-FR")} FCFA
+                  {Number(b.total_price || 0).toLocaleString("fr-FR")} FCFA
                 </td>
                 <td className="td"><StatusBadge status={b.status} /></td>
                 <td className="td">

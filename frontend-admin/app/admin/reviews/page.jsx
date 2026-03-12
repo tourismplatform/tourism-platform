@@ -21,7 +21,10 @@ export default function AdminReviews() {
 
   const load = () => {
     reviewsAPI.getAll()
-      .then(d => { setReviews(d.reviews || d); setLoading(false); })
+      .then(d => { 
+        setReviews(d.data || d.reviews || (Array.isArray(d) ? d : [])); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   };
   useEffect(load, []);
@@ -69,28 +72,28 @@ export default function AdminReviews() {
       ) : (
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
           {reviews.map(r => (
-            <div key={r._id} className="card" style={{ padding:22, display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:16 }}>
+            <div key={r.id || r._id} className="card" style={{ padding:22, display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:16 }}>
               <div style={{ display:"flex", gap:14, flex:1 }}>
 
                 {/* Avatar */}
                 <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(135deg,var(--blue-600),var(--blue-800))", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:18, flexShrink:0 }}>
-                  {r.userId?.name?.charAt(0)?.toUpperCase() || "?"}
+                  {(r.users?.name || "?").charAt(0).toUpperCase()}
                 </div>
 
                 <div style={{ flex:1 }}>
                   {/* Nom + date */}
                   <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", marginBottom:4 }}>
                     <span style={{ fontWeight:700, color:"var(--gray-900)", fontSize:14 }}>
-                      {r.userId?.name || "Visiteur"}
+                      {r.users?.name || "Visiteur"}
                     </span>
                     <span style={{ fontSize:12, color:"var(--gray-400)" }}>
-                      {r.userId?.email} · {new Date(r.createdAt).toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" })}
+                      {r.users?.email} · {new Date(r.created_at || r.createdAt).toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" })}
                     </span>
                   </div>
 
                   {/* Destination */}
                   <div style={{ fontSize:12, color:"var(--blue-600)", fontWeight:700, marginBottom:6 }}>
-                    📍 {r.destinationId?.name || "Destination supprimée"}
+                    📍 {r.destinations?.name || "Destination supprimée"}
                   </div>
 
                   {/* Étoiles */}
@@ -106,7 +109,7 @@ export default function AdminReviews() {
 
               {/* Bouton supprimer */}
               <button
-                onClick={() => setModal({ open:true, id:r._id })}
+                onClick={() => setModal({ open:true, id:r.id || r._id })}
                 style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:10, padding:"8px 16px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)", flexShrink:0 }}
               >
                 🗑 Supprimer

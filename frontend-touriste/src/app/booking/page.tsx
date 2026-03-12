@@ -1,30 +1,68 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
+import api from '@/lib/api';
+import Cookies from 'js-cookie';
 
 export default function BookingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [txn, setTxn] = useState('');
+  const [bookingId, setBookingId] = useState('');
+  const [error, setError] = useState('');
 
-  const bookingData = {
-    destination_name: 'Parc National du W',
-    start_date: '2026-04-10',
-    end_date: '2026-04-12',
-    nb_persons: 2,
-    total_price: 30000,
-  };
+  const destination_id = searchParams.get('destination_id') || '';
+  const check_in = searchParams.get('check_in') || '';
+  const check_out = searchParams.get('check_out') || '';
+  const nb_persons = Number(searchParams.get('nb_persons') || 1);
+  const total_price = Number(searchParams.get('total_price') || 0);
+  const [destinationName, setDestinationName] = useState('');
 
-  const doPayment = () => {
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login?redirect=/booking');
+      return;
+    }
+    if (destination_id) {
+      api.get(`/destinations/${destination_id}`)
+        .then(res => setDestinationName(res.data.data.name))
+        .catch(() => setDestinationName('Destination'));
+    }
+  }, [destination_id, isAuthenticated]);
+
+  const doBookingAndPayment = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setTxn(String(Math.floor(Math.random() * 90000 + 10000)));
+    setError('');
+    try {
+      // Étape 1 — Créer la réservation
+      const bookingRes = await api.post('/bookings', {
+        destination_id,
+        check_in,
+        check_out,
+        nb_persons,
+        total_price,
+      });
+      const newBookingId = bookingRes.data.data.id;
+      setBookingId(newBookingId);
+
+      // Étape 2 — Paiement mock
+      const paymentRes = await api.post('/payments/process', {
+        booking_id: newBookingId,
+        amount: total_price,
+        currency: 'XOF',
+        card_number: '4111111111111111',
+      });
+      setTxn(paymentRes.data.data.transaction_id || 'MOCK_' + Date.now());
       setStep(3);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erreur lors de la réservation');
+    } finally {
       setLoading(false);
-    }, 1800);
+    }
   };
 
   const steps = [
@@ -64,10 +102,10 @@ export default function BookingPage() {
             <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.8rem', fontWeight: 700, marginBottom: 24 }}>Récapitulatif</h2>
             <div style={{ background: '#f4f6fa', borderRadius: 12, padding: 20, marginBottom: 24 }}>
               {[
-                ['Destination', bookingData.destination_name],
-                ['Arrivée', new Date(bookingData.start_date).toLocaleDateString('fr-FR')],
-                ['Départ', new Date(bookingData.end_date).toLocaleDateString('fr-FR')],
-                ['Personnes', `${bookingData.nb_persons}`],
+                ['Destination', destinationName],
+                ['Arrivée', new Date(check_in).toLocaleDateString('fr-FR')],
+                ['Départ', new Date(check_out).toLocaleDateString('fr-FR')],
+                ['Personnes', `${nb_persons}`],
               ].map(([label, value]) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #e5e7eb' }}>
                   <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>{label}</span>
@@ -76,7 +114,7 @@ export default function BookingPage() {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0 0', fontWeight: 700, fontSize: '1.1rem', color: '#1a4fd6' }}>
                 <span>Total</span>
-                <span>{bookingData.total_price.toLocaleString()} FCFA</span>
+                <span>{total_price.toLocaleString()} FCFA</span>
               </div>
             </div>
             <button onClick={() => setStep(2)} style={{ width: '100%', background: '#1a4fd6', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
@@ -89,9 +127,14 @@ export default function BookingPage() {
         {step === 2 && (
           <>
             <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.8rem', fontWeight: 700, marginBottom: 8 }}>Paiement</h2>
-            <p style={{ color: '#6b7280', marginBottom: 24, fontSize: '0.9rem' }}>Montant à payer : <strong style={{ color: '#1a4fd6' }}>{bookingData.total_price.toLocaleString()} FCFA</strong></p>
+            <p style={{ color: '#6b7280', marginBottom: 24, fontSize: '0.9rem' }}>Montant à payer : <strong style={{ color: '#1a4fd6' }}>{total_price.toLocaleString()} FCFA</strong></p>
 
-            {/* Méthodes */}
+            {error && (
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, color: '#ef4444', fontSize: '0.88rem' }}>
+                {error}
+              </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
               {[{ icon: '💳', label: 'Carte bancaire' }, { icon: '📱', label: 'Mobile Money' }].map(m => (
                 <div key={m.label} style={{ border: '2px solid #1a4fd6', borderRadius: 12, padding: 16, textAlign: 'center', cursor: 'pointer', background: '#eff6ff' }}>
@@ -101,7 +144,7 @@ export default function BookingPage() {
               ))}
             </div>
 
-            <button onClick={doPayment} disabled={loading} style={{ width: '100%', background: loading ? '#93c5fd' : '#ff5722', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
+            <button onClick={doBookingAndPayment} disabled={loading} style={{ width: '100%', background: loading ? '#93c5fd' : '#ff5722', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
               {loading ? '⏳ Traitement en cours...' : '💳 Confirmer le paiement'}
             </button>
             <button onClick={() => setStep(1)} style={{ width: '100%', background: 'transparent', border: 'none', color: '#6b7280', marginTop: 12, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'var(--font-outfit), sans-serif' }}>
@@ -119,9 +162,14 @@ export default function BookingPage() {
             </h2>
             <p style={{ color: '#6b7280', marginBottom: 8 }}>Votre réservation a été enregistrée avec succès.</p>
             <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: 32 }}>N° de transaction : <strong>#{txn}</strong></p>
-            <button onClick={() => router.push('/')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
-              Retour à l'accueil
-            </button>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button onClick={() => router.push('/my-bookings')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
+                Voir mes réservations
+              </button>
+              <button onClick={() => router.push('/')} style={{ background: 'transparent', color: '#1a4fd6', border: '2px solid #1a4fd6', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
+                Retour à l'accueil
+              </button>
+            </div>
           </div>
         )}
       </div>

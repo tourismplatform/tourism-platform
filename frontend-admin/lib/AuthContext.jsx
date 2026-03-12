@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Cookies } from "./cookies";
 
 const AuthContext = createContext(null);
 
@@ -9,23 +10,31 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const saved = localStorage.getItem("user");
+    const token = Cookies.get("token");
+    const saved = Cookies.get("user");
     if (token && saved) {
-      try { setUser(JSON.parse(saved)); } catch {}
+      try { 
+        // Les cookies sont encodés en URL, on décode pour le JSON
+        setUser(JSON.parse(decodeURIComponent(saved))); 
+      } catch {
+        // Fallback si ce n'est pas du JSON encodé (cas d'un cookie simple)
+        try { setUser(JSON.parse(saved)); } catch {}
+      }
     }
     setLoading(false);
   }, []);
 
   const login = (userData, token) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
+    // Note: On laisse le portail touriste gérer l'écriture des cookies au login 
+    // car il a déjà la logique js-cookie avec expiration.
+    // Mais on met à jour l'état local ici.
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    // Supprimer les cookies pour déconnecter partout
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setUser(null);
   };
 

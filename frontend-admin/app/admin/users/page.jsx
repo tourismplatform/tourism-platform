@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import { usersAPI } from "@/lib/api";
+import { adminAPI } from "@/lib/api";
 
 export default function AdminUsers() {
   
@@ -10,8 +10,11 @@ export default function AdminUsers() {
   const [search, setSearch]   = useState("");
 
   useEffect(() => {
-    usersAPI.getAll()
-      .then(d => { setUsers(d.users || d); setLoading(false); })
+    adminAPI.getUsers()
+      .then(d => { 
+        setUsers(d.data || d.users || (Array.isArray(d) ? d : [])); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -70,25 +73,25 @@ export default function AdminUsers() {
                 </td>
               </tr>
             ) : filtered.map((u, i) => (
-              <tr key={u._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
+              <tr key={u.id || u._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
                 <td className="td">
                   <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,var(--blue-600),var(--blue-800))", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14, flexShrink:0 }}>
-                      {u.name?.charAt(0)?.toUpperCase()}
+                      {(u.name || "?").charAt(0).toUpperCase()}
                     </div>
                     <span style={{ fontWeight:700, fontSize:14, color:"var(--gray-900)" }}>
-                      {u.name}
+                      {u.name || "Utilisateur"}
                     </span>
                   </div>
                 </td>
                 <td className="td" style={{ color:"var(--gray-600)", fontSize:13 }}>{u.email}</td>
                 <td className="td">
-                  <span style={{ fontSize:12, fontWeight:700, padding:"3px 12px", borderRadius:20, background: u.role==="admin" ? "var(--red-l)" : "var(--blue-50)", color: u.role==="admin" ? "var(--red)" : "var(--blue-700)" }}>
-                    {u.role === "admin" ? "👑 Admin" : "🧳 Touriste"}
+                  <span style={{ fontSize:12, fontWeight:700, padding:"3px 12px", borderRadius:20, background: u.role==="ADMIN" ? "var(--red-l)" : "var(--blue-50)", color: u.role==="ADMIN" ? "var(--red)" : "var(--blue-700)" }}>
+                    {u.role === "ADMIN" ? "👑 Admin" : "🧳 Touriste"}
                   </span>
                 </td>
                 <td className="td" style={{ color:"var(--gray-400)", fontSize:13 }}>
-                  {new Date(u.createdAt).toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" })}
+                  {new Date(u.created_at || u.createdAt).toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" })}
                 </td>
               </tr>
             ))}

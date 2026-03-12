@@ -119,7 +119,7 @@ export class BookingsService {
     const client = this.supabase.getClient();
     const { data, error } = await client
       .from('bookings')
-      .select('*, destinations(name), users(email)')
+      .select('*, destinations(name), users(name, email)')
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);

@@ -46,12 +46,22 @@ export class ReviewsService {
   async findByDestination(destinationId: string) {
     const client = this.supabase.getClient();
     const { data, error } = await client
-      .from('reviews').select('*, users(email)')
+      .from('reviews').select('*, users(name, email)')
       .eq('destination_id', destinationId).eq('status', 'VISIBLE')
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
     return { data, message: 'Avis récupérés' };
+  }
+
+  async findAll() {
+    const client = this.supabase.getClient();
+    const { data, error } = await client
+      .from('reviews').select('*, users(name, email), destinations(name)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return { data, message: 'Tous les avis récupérés' };
   }
 
   async remove(id: string) {

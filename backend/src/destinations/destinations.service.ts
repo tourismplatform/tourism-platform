@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../supabase.service';
 import { CreateDestinationDto } from './dto/create-destination.dto';
 import { FilterDestinationDto } from './dto/filter-destination.dto';
+import { UpdateDestinationDto } from './dto/update-destination.dto';
 
 @Injectable()
 export class DestinationsService {
@@ -39,26 +40,47 @@ export class DestinationsService {
 
   async create(dto: CreateDestinationDto, adminId: string) {
     const client = this.supabase.getClient();
-    const { data, error } = await client
+    const { images, ...destData } = dto;
+
+    const { data: dest, error: destError } = await client
       .from('destinations')
-      .insert({ ...dto, status: 'DRAFT', created_by: adminId })
+      .insert({ ...destData, status: 'PUBLISHED', created_by: adminId })
       .select()
       .single();
 
-    if (error) throw new Error(error.message);
-    return { data, message: 'Destination créée' };
+    if (destError) throw new Error(destError.message);
+
+    // Si on a des images, les insérer
+    if (images && images.length > 0) {
+      const imageInserts = images.map(url => ({
+        destination_id: dest.id,
+        url: url,
+        uploaded_by: adminId,
+        is_cover: false
+      }));
+      await client.from('destination_images').insert(imageInserts);
+    }
+
+    return { data: dest, message: 'Destination créée' };
   }
 
-  async update(id: string, dto: Partial<CreateDestinationDto>) {
+  async update(id: string, dto: UpdateDestinationDto) {
     const client = this.supabase.getClient();
+    const { images, ...destData } = dto;
+
     const { data, error } = await client
       .from('destinations')
-      .update(dto)
+      .update(destData)
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw new Error(error.message);
+
+    // Gestion simple des images lors de l'update : on peut ajouter de nouvelles images 
+    // ou tout remplacer selon le besoin. Ici, on va juste mettre à jour les infos de base.
+    // L'ajout d'image spécifique utilise déjà addImage().
+    
     return { data, message: 'Destination modifiée' };
   }
 

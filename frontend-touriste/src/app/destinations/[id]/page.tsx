@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { mockDestinations, mockReviews } from '@/lib/mockData';
 import { Destination, Review } from '@/types';
 import { useAuthStore } from '@/lib/auth';
+import api from '@/lib/api';
 
 const ICONS: Record<string, string> = { NATURE: '🌿', CULTURE: '🏛️', AVENTURE: '⛰️', PLAGE: '🏖️' };
 const COLORS: Record<string, string> = {
@@ -27,14 +27,18 @@ export default function DestinationDetailPage() {
   const [persons, setPersons] = useState(1);
 
   useEffect(() => {
-    setDestination(mockDestinations.find(d => d.id === id) || null);
-    setReviews(mockReviews.filter(r => r.destination_id === id));
+    api.get(`/destinations/${id}`)
+      .then(res => setDestination(res.data.data))
+      .catch(() => setDestination(null));
+    api.get(`/reviews/${id}`)
+      .then(res => setReviews(res.data.data))
+      .catch(() => setReviews([]));
   }, [id]);
 
   if (!destination) return <div style={{ textAlign: 'center', padding: 80 }}>Chargement...</div>;
 
   const nights = Math.max(1, Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000));
-  const total = destination.price * persons * nights;
+  const total = (destination.price_per_person || 0) * persons * nights;
   const icon = ICONS[destination.category] || '📍';
   const color = COLORS[destination.category] || 'linear-gradient(135deg, #1a4fd6, #00875a)';
 
@@ -53,7 +57,7 @@ export default function DestinationDetailPage() {
       {/* LAYOUT 2 colonnes */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 30, alignItems: 'start' }}>
 
-        {/* ===== COLONNE GAUCHE ===== */}
+        {/* COLONNE GAUCHE */}
         <div>
           {/* Galerie */}
           <div style={{ borderRadius: 16, overflow: 'hidden', background: color, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '6rem', marginBottom: 12, position: 'relative' }}>
@@ -76,7 +80,7 @@ export default function DestinationDetailPage() {
           <div style={{ display: 'flex', gap: 20, color: '#6b7280', fontSize: '0.85rem', marginBottom: 16, flexWrap: 'wrap' }}>
             <span>📍 {destination.location}</span>
             <span>🌿 {destination.category}</span>
-            <span>⭐ {destination.rating}/5 ({reviews.length} avis)</span>
+            <span>⭐ {destination.avg_rating || 0}/5 ({reviews.length} avis)</span>
           </div>
 
           {/* Tags */}
@@ -111,21 +115,19 @@ export default function DestinationDetailPage() {
           </div>
         </div>
 
-        {/* ===== WIDGET RÉSERVATION (colonne droite) ===== */}
+        {/* WIDGET RÉSERVATION */}
         <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 24px rgba(10,15,30,0.08)', padding: 24, position: 'sticky', top: 84 }}>
 
-          {/* Prix */}
           <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.9rem', fontWeight: 700, color: '#1a4fd6', marginBottom: 4 }}>
-            {destination.price.toLocaleString()} FCFA{' '}
+            {(destination.price_per_person || 0).toLocaleString()} FCFA{' '}
             <small style={{ fontSize: '0.9rem', color: '#6b7280', fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 400 }}>/personne</small>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 18, fontSize: '0.85rem' }}>
-            <span style={{ color: '#d97706' }}>⭐ {destination.rating}</span>
+            <span style={{ color: '#d97706' }}>⭐ {destination.avg_rating || 0}</span>
             <span style={{ color: '#6b7280' }}>· {reviews.length} avis</span>
             <span style={{ color: '#6b7280' }}>· 📍 {destination.location}</span>
           </div>
 
-          {/* ✅ FORMULAIRE TOUJOURS VISIBLE */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div>
               <label style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#0a0f1e', display: 'block', marginBottom: 6 }}>Arrivée</label>
@@ -145,27 +147,25 @@ export default function DestinationDetailPage() {
               style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '11px 14px', fontSize: '0.88rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', boxSizing: 'border-box' }} />
           </div>
 
-          {/* Total */}
           <div style={{ background: '#eff6ff', borderRadius: 10, padding: '14px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Total estimé</span>
             <span style={{ fontWeight: 700, color: '#1a4fd6', fontSize: '1.1rem' }}>{total.toLocaleString()} FCFA</span>
           </div>
 
-          {/* ✅ BOUTON — vérifie connexion au clic */}
           <button
             onClick={() => {
               if (!isAuthenticated) {
                 router.push(`/login?redirect=/destinations/${id}`);
                 return;
               }
-              router.push('/booking');
+              router.push(`/booking?destination_id=${id}&check_in=${startDate}&check_out=${endDate}&nb_persons=${persons}&total_price=${total}`);
             }}
             style={{ width: '100%', background: '#ff5722', color: 'white', border: 'none', padding: '14px', borderRadius: 10, fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif', transition: 'background 0.2s' }}>
             Réserver maintenant
           </button>
 
           <p style={{ textAlign: 'center', fontSize: '0.78rem', color: '#6b7280', marginTop: 12 }}>
-            Capacité max : 80 personnes/jour
+            Capacité max : {destination.capacity || 80} personnes/jour
           </p>
         </div>
       </div>

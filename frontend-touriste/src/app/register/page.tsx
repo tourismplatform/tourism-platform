@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
 import Link from 'next/link';
+import api from '@/lib/api';
+import Cookies from 'js-cookie';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -25,10 +27,21 @@ export default function RegisterPage() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(res => setTimeout(res, 1000));
-    login({ id: 'u1', name: form.name, email: form.email, role: 'TOURIST' }, 'mock-token');
-    router.push('/');
-    setLoading(false);
+    try {
+      const res = await api.post('/auth/register', {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      });
+      const { token, user } = res.data.data;
+      Cookies.set('token', token, { expires: 1 });
+      login(user, token);
+      router.push('/');
+    } catch (err: any) {
+      setErrors({ global: err.response?.data?.message || 'Erreur lors de l\'inscription' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fields = [
@@ -48,6 +61,12 @@ export default function RegisterPage() {
 
         <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 6, color: '#0a0f1e' }}>Créer un compte</h2>
         <p style={{ color: '#6b7280', marginBottom: 32, fontSize: '0.9rem' }}>Rejoignez TourismBF gratuitement !</p>
+
+        {errors.global && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, color: '#ef4444', fontSize: '0.88rem' }}>
+            {errors.global}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {fields.map(f => (

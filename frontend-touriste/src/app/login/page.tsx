@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
 import Link from 'next/link';
+import api from '@/lib/api';
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,7 +12,7 @@ export default function LoginPage() {
   const redirectTo = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('redirect') || '/' : '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
+  const [errors, setErrors] = useState<{email?: string; password?: string; global?: string}>({});
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
@@ -27,10 +29,20 @@ export default function LoginPage() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise(res => setTimeout(res, 1000));
-    login({ id: 'u1', name: 'Alimata', email, role: 'TOURIST' }, 'mock-token');
-    router.push(redirectTo);
-    setLoading(false);
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      const { token, user } = res.data.data;
+      login(user, token);
+      if (user.role === 'admin' || user.role === 'ADMIN') {
+        window.location.href = 'http://localhost:3002/admin';
+      } else {
+        router.push(redirectTo || '/');
+      }
+    } catch (err: any) {
+      setErrors({ global: err.response?.data?.message || 'Email ou mot de passe incorrect' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,6 +67,12 @@ export default function LoginPage() {
 
           <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 6, color: '#0a0f1e' }}>Connexion</h2>
           <p style={{ color: '#6b7280', marginBottom: 32, fontSize: '0.9rem' }}>Bienvenue ! Entrez vos identifiants.</p>
+
+          {errors.global && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, color: '#ef4444', fontSize: '0.88rem' }}>
+              {errors.global}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
