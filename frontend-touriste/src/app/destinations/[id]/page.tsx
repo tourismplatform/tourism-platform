@@ -1,0 +1,174 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { mockDestinations, mockReviews } from '@/lib/mockData';
+import { Destination, Review } from '@/types';
+import { useAuthStore } from '@/lib/auth';
+
+const ICONS: Record<string, string> = { NATURE: '🌿', CULTURE: '🏛️', AVENTURE: '⛰️', PLAGE: '🏖️' };
+const COLORS: Record<string, string> = {
+  NATURE: 'linear-gradient(135deg, #00875a, #34d399)',
+  CULTURE: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+  AVENTURE: 'linear-gradient(135deg, #ff5722, #f59e0b)',
+  PLAGE: 'linear-gradient(135deg, #1a4fd6, #06b6d4)',
+};
+
+export default function DestinationDetailPage() {
+  const { id } = useParams();
+  const router = useRouter();
+  const [destination, setDestination] = useState<Destination | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const { isAuthenticated } = useAuthStore();
+
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  const after = new Date(); after.setDate(after.getDate() + 3);
+  const [startDate, setStartDate] = useState(tomorrow.toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(after.toISOString().split('T')[0]);
+  const [persons, setPersons] = useState(1);
+
+  useEffect(() => {
+    setDestination(mockDestinations.find(d => d.id === id) || null);
+    setReviews(mockReviews.filter(r => r.destination_id === id));
+  }, [id]);
+
+  if (!destination) return <div style={{ textAlign: 'center', padding: 80 }}>Chargement...</div>;
+
+  const nights = Math.max(1, Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000));
+  const total = destination.price * persons * nights;
+  const icon = ICONS[destination.category] || '📍';
+  const color = COLORS[destination.category] || 'linear-gradient(135deg, #1a4fd6, #00875a)';
+
+  return (
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 40px' }}>
+
+      {/* Fil d'ariane */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 20, fontSize: '0.85rem', color: '#6b7280' }}>
+        <span onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>Accueil</span>
+        <span>›</span>
+        <span onClick={() => router.push('/destinations')} style={{ cursor: 'pointer' }}>Destinations</span>
+        <span>›</span>
+        <span style={{ color: '#0a0f1e', fontWeight: 600 }}>{destination.name}</span>
+      </div>
+
+      {/* LAYOUT 2 colonnes */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 30, alignItems: 'start' }}>
+
+        {/* ===== COLONNE GAUCHE ===== */}
+        <div>
+          {/* Galerie */}
+          <div style={{ borderRadius: 16, overflow: 'hidden', background: color, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '6rem', marginBottom: 12, position: 'relative' }}>
+            {icon}
+          </div>
+
+          {/* Miniatures */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+            {[color, 'linear-gradient(135deg, #ff5722, #f59e0b)', 'linear-gradient(135deg, #8b5cf6, #ec4899)', 'rgba(55,65,81,1)'].map((c, i) => (
+              <div key={i} style={{ flex: 1, height: 70, borderRadius: 8, cursor: 'pointer', border: i === 0 ? '2px solid #1a4fd6' : '2px solid transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', background: c, fontSize: '1.5rem', color: 'white' }}>
+                {i === 3 ? <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>+4</span> : icon}
+              </div>
+            ))}
+          </div>
+
+          {/* Infos */}
+          <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.2rem', fontWeight: 700, marginBottom: 10, color: '#0a0f1e' }}>
+            {destination.name}
+          </h1>
+          <div style={{ display: 'flex', gap: 20, color: '#6b7280', fontSize: '0.85rem', marginBottom: 16, flexWrap: 'wrap' }}>
+            <span>📍 {destination.location}</span>
+            <span>🌿 {destination.category}</span>
+            <span>⭐ {destination.rating}/5 ({reviews.length} avis)</span>
+          </div>
+
+          {/* Tags */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+            {['Guidé', 'Transport inclus', 'Repas inclus', 'Hébergement'].map(tag => (
+              <span key={tag} style={{ background: '#eff6ff', color: '#1a4fd6', padding: '5px 12px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 600 }}>{tag}</span>
+            ))}
+          </div>
+
+          {/* Description */}
+          <div style={{ background: 'white', borderRadius: 14, padding: 24, marginBottom: 24, boxShadow: '0 4px 24px rgba(10,15,30,0.08)' }}>
+            <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.3rem', fontWeight: 700, marginBottom: 12 }}>Description</h2>
+            <p style={{ fontSize: '0.92rem', lineHeight: 1.8, color: '#374151' }}>{destination.description}</p>
+          </div>
+
+          {/* Avis */}
+          <div style={{ background: 'white', borderRadius: 14, padding: 24, boxShadow: '0 4px 24px rgba(10,15,30,0.08)' }}>
+            <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
+              Avis des voyageurs ({reviews.length})
+            </h2>
+            {reviews.length === 0 ? (
+              <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Pas encore d'avis pour cette destination.</p>
+            ) : reviews.map(review => (
+              <div key={review.id} style={{ borderBottom: '1px solid #f4f6fa', paddingBottom: 16, marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{review.user?.name}</span>
+                  <span style={{ color: '#d97706', fontSize: '0.85rem' }}>{'⭐'.repeat(review.rating)}</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>{review.comment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== WIDGET RÉSERVATION (colonne droite) ===== */}
+        <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 24px rgba(10,15,30,0.08)', padding: 24, position: 'sticky', top: 84 }}>
+
+          {/* Prix */}
+          <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.9rem', fontWeight: 700, color: '#1a4fd6', marginBottom: 4 }}>
+            {destination.price.toLocaleString()} FCFA{' '}
+            <small style={{ fontSize: '0.9rem', color: '#6b7280', fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 400 }}>/personne</small>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 18, fontSize: '0.85rem' }}>
+            <span style={{ color: '#d97706' }}>⭐ {destination.rating}</span>
+            <span style={{ color: '#6b7280' }}>· {reviews.length} avis</span>
+            <span style={{ color: '#6b7280' }}>· 📍 {destination.location}</span>
+          </div>
+
+          {/* ✅ FORMULAIRE TOUJOURS VISIBLE */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+            <div>
+              <label style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#0a0f1e', display: 'block', marginBottom: 6 }}>Arrivée</label>
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '11px 14px', fontSize: '0.88rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#0a0f1e', display: 'block', marginBottom: 6 }}>Départ</label>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '11px 14px', fontSize: '0.88rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#0a0f1e', display: 'block', marginBottom: 6 }}>Personnes</label>
+            <input type="number" value={persons} min={1} max={20} onChange={e => setPersons(Number(e.target.value))}
+              style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '11px 14px', fontSize: '0.88rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+          </div>
+
+          {/* Total */}
+          <div style={{ background: '#eff6ff', borderRadius: 10, padding: '14px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Total estimé</span>
+            <span style={{ fontWeight: 700, color: '#1a4fd6', fontSize: '1.1rem' }}>{total.toLocaleString()} FCFA</span>
+          </div>
+
+          {/* ✅ BOUTON — vérifie connexion au clic */}
+          <button
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push(`/login?redirect=/destinations/${id}`);
+                return;
+              }
+              router.push('/booking');
+            }}
+            style={{ width: '100%', background: '#ff5722', color: 'white', border: 'none', padding: '14px', borderRadius: 10, fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif', transition: 'background 0.2s' }}>
+            Réserver maintenant
+          </button>
+
+          <p style={{ textAlign: 'center', fontSize: '0.78rem', color: '#6b7280', marginTop: 12 }}>
+            Capacité max : 80 personnes/jour
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
