@@ -1,11 +1,17 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
-import { Cookies } from "./cookies";
+function getToken() {
+  if (typeof window === "undefined") return null;
+  const cookies = document.cookie.split(";");
+  for (let c of cookies) {
+    const [key, val] = c.trim().split("=");
+    if (key === "token") return val;
+  }
+  return null;
+}
 
 function authHeaders() {
-  const token = typeof window !== "undefined"
-    ? Cookies.get("token")
-    : null;
+  const token = getToken();
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -54,11 +60,10 @@ export const reviewsAPI = {
   delete:    (id)    => request("DELETE", `/admin/reviews/${id}`),
 };
 
-
 export async function uploadImage(file) {
   const formData = new FormData();
   formData.append("image", file);
-  const token = Cookies.get("token");
+  const token = getToken();
   const res = await fetch(`${BASE_URL}/upload`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
