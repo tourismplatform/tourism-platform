@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
+import { useEffect } from "react";
 
 const NAV = [
   { href:"/admin",              icon:"📊", label:"Tableau de bord" },
@@ -12,9 +13,26 @@ const NAV = [
 ];
 
 export default function AdminLayout({ children }) {
-  const { logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router   = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (!loading && (!user || user.role !== "ADMIN")) {
+      window.location.href = "http://localhost:3000/login";
+    }
+  }, [user, loading]);
+
+  if (loading || !user || user.role !== "ADMIN") {
+    return (
+      <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"#f1efe8" }}>
+        <div style={{ textAlign:"center", color:"#888780" }}>
+          <div style={{ fontSize:32, marginBottom:12 }}>⏳</div>
+          <div style={{ fontSize:14 }}>Vérification en cours...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display:"flex", minHeight:"100vh" }}>
@@ -50,13 +68,15 @@ export default function AdminLayout({ children }) {
         {/* User */}
         <div style={{ padding:"16px 20px", borderTop:"1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-            <div style={{ width:34, height:34, borderRadius:"50%", background:"var(--blue-600)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14 }}>A</div>
+            <div style={{ width:34, height:34, borderRadius:"50%", background:"var(--blue-600)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14 }}>
+              {user?.name?.charAt(0).toUpperCase() || "A"}
+            </div>
             <div>
-              <div style={{ fontSize:13, fontWeight:600, color:"var(--white)" }}>Administrateur</div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>Admin</div>
+              <div style={{ fontSize:13, fontWeight:600, color:"var(--white)" }}>{user?.name || "Administrateur"}</div>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>{user?.email}</div>
             </div>
           </div>
-          <button onClick={() => { if(logout) logout(); window.location.href = "http://localhost:3000"; }} style={{ width:"100%", padding:"8px", borderRadius:8, fontSize:12, fontWeight:600, background:"rgba(220,38,38,0.15)", border:"1px solid rgba(220,38,38,0.3)", color:"#fca5a5", cursor:"pointer", fontFamily:"var(--font-body)" }}>
+          <button onClick={() => { if(logout) logout(); window.location.href = "http://localhost:3000/login"; }} style={{ width:"100%", padding:"8px", borderRadius:8, fontSize:12, fontWeight:600, background:"rgba(220,38,38,0.15)", border:"1px solid rgba(220,38,38,0.3)", color:"#fca5a5", cursor:"pointer", fontFamily:"var(--font-body)" }}>
             🚪 Se déconnecter
           </button>
         </div>

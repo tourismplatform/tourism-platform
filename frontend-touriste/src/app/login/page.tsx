@@ -32,12 +32,14 @@ export default function LoginPage() {
     try {
       const res = await api.post('/auth/login', { email, password });
       const { token, user } = res.data.data;
-      login(user, token);
-      if (user.role === 'admin' || user.role === 'ADMIN') {
-        window.location.href = 'http://localhost:3002/admin';
-      } else {
-        router.push(redirectTo || '/');
-      }
+Cookies.set('token', token, { expires: 1 });
+Cookies.set('user', JSON.stringify(user), { expires: 1 });
+login(user, token);
+if (user.role === 'ADMIN') {
+  window.location.href = 'http://localhost:3002/admin';
+} else {
+  router.push(redirectTo || '/');
+}
     } catch (err: any) {
       setErrors({ global: err.response?.data?.message || 'Email ou mot de passe incorrect' });
     } finally {

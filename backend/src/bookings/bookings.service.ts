@@ -90,16 +90,29 @@ export class BookingsService {
 
   // ─── Mes réservations ──────────────────────────────────────────────
   async findMyBookings(userId: string) {
-    const client = this.supabase.getClient();
-    const { data, error } = await client
-      .from('bookings')
-      .select('*, destinations(name, location, category)')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+  const client = this.supabase.getClient();
+  const { data, error } = await client
+    .from('bookings')
+    .select('*, destinations(name, location, category)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
 
-    if (error) throw new Error(error.message);
-    return { data, message: 'Mes réservations récupérées' };
+  if (error) throw new Error(error.message);
+
+  // Auto-complétion si check_out dépassé
+  const now = new Date();
+  for (const booking of data || []) {
+    if (booking.status === 'CONFIRMED' && new Date(booking.check_out) < now) {
+      await client
+        .from('bookings')
+        .update({ status: 'COMPLETED' })
+        .eq('id', booking.id);
+      booking.status = 'COMPLETED';
+    }
   }
+
+  return { data, message: 'Mes réservations récupérées' };
+}
 
   // ─── Détail d'une réservation ──────────────────────────────────────
   async findOne(id: string, userId: string) {

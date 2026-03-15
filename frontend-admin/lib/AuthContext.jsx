@@ -43,8 +43,8 @@ export function AuthProvider({ children }) {
       user,
       login,
       logout,
-      isAdmin:    user?.role === "admin",
-      isTouriste: user?.role === "touriste",
+      isAdmin:    user?.role === "ADMIN",
+      isTouriste: user?.role === "TOURIST",
       loading,
     }}>
       {children}

@@ -110,16 +110,21 @@ export default function AdminBookings() {
                 <td className="td"><StatusBadge status={b.status} /></td>
                 <td className="td">
                   <div style={{ display:"flex", gap:6 }}>
-                    {b.status !== "CONFIRMED" && (
-                      <button onClick={() => setModal({ open:true, id:b.id, action:"CONFIRMED" })} style={{ background:"var(--green-l)", color:"var(--green)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
-                        ✓ Confirmer
-                      </button>
-                    )}
-                    {b.status !== "CANCELLED" && (
-                      <button onClick={() => setModal({ open:true, id:b.id, action:"CANCELLED" })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
-                        ✕ Annuler
-                      </button>
-                    )}
+                   {b.status !== "CONFIRMED" && b.status !== "COMPLETED" && (
+  <button onClick={() => setModal({ open:true, id:b.id, action:"CONFIRMED" })} style={{ background:"var(--green-l)", color:"var(--green)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+    ✓ Confirmer
+  </button>
+)}
+{b.status === "CONFIRMED" && (
+  <button onClick={() => setModal({ open:true, id:b.id, action:"COMPLETED" })} style={{ background:"#dbeafe", color:"#1e40af", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+    ✅ Terminer
+  </button>
+)}
+{b.status !== "CANCELLED" && b.status !== "COMPLETED" && (
+  <button onClick={() => setModal({ open:true, id:b.id, action:"CANCELLED" })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"5px 12px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+    ✕ Annuler
+  </button>
+)}
                   </div>
                 </td>
               </tr>
@@ -130,10 +135,22 @@ export default function AdminBookings() {
 
       <ConfirmModal
         isOpen={modal.open}
-        title={modal.action === "CONFIRMED" ? "Confirmer cette réservation ?" : "Annuler cette réservation ?"}
+       title={
+  modal.action === "CONFIRMED" ? "Confirmer cette réservation ?" :
+  modal.action === "COMPLETED" ? "Marquer comme terminée ?" :
+  "Annuler cette réservation ?"
+}
         message="Le touriste sera notifié par email."
-        confirmLabel={modal.action === "CONFIRMED" ? "✓ Oui, confirmer" : "✕ Oui, annuler"}
-        confirmColor={modal.action === "CONFIRMED" ? "var(--green)" : "var(--red)"}
+       confirmLabel={
+  modal.action === "CONFIRMED" ? "✓ Oui, confirmer" :
+  modal.action === "COMPLETED" ? "✅ Oui, terminer" :
+  "✕ Oui, annuler"
+}
+confirmColor={
+  modal.action === "CONFIRMED" ? "var(--green)" :
+  modal.action === "COMPLETED" ? "#1e40af" :
+  "var(--red)"
+}
         onConfirm={handleAction}
         onCancel={() => setModal({ open:false, id:null, action:null })}
       />
