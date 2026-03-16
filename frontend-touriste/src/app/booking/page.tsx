@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
 import api from '@/lib/api';
 import Cookies from 'js-cookie';
+export const dynamic = 'force-dynamic';
 
 export default function BookingPage() {
   const router = useRouter();
