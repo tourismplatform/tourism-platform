@@ -22,6 +22,8 @@ export interface User {
   name: string;
   email: string;
   role: 'TOURIST' | 'ADMIN';
+  phone?: string;  // Ajoute cette ligne
+  avatar?: string; // Ajoute aussi avatar car tu l'utilises dans profile/page.tsx
 }
 
 export interface Booking {
