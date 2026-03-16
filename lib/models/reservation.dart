@@ -1,5 +1,22 @@
 enum ReservationStatus { pending, confirmed, cancelled }
 
+extension ReservationStatusExtension on ReservationStatus {
+  static ReservationStatus fromString(String status) {
+    switch (status.toUpperCase()) {
+      case 'CONFIRMED':
+        return ReservationStatus.confirmed;
+      case 'CANCELLED':
+        return ReservationStatus.cancelled;
+      default:
+        return ReservationStatus.pending;
+    }
+  }
+
+  String toShortString() {
+    return toString().split('.').last.toUpperCase();
+  }
+}
+
 class Reservation {
   final String id;
   final String userId;
@@ -40,7 +57,7 @@ class Reservation {
       numberOfPeople: json['numberOfPeople'] ?? 0,
       totalPrice: (json['totalPrice'] ?? 0.0).toDouble(),
       comment: json['comment'],
-      status: ReservationStatus.values[json['status'] ?? 0],
+      status: ReservationStatusExtension.fromString(json['status'] ?? 'PENDING'),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
@@ -56,7 +73,7 @@ class Reservation {
       'numberOfPeople': numberOfPeople,
       'totalPrice': totalPrice,
       'comment': comment,
-      'status': status.index,
+      'status': status.toShortString(),
       'createdAt': createdAt.toIso8601String(),
     };
   }

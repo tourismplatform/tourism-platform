@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
+import '../services/booking_service.dart';
 
 class ReservationProvider extends ChangeNotifier {
   final List<Reservation> _reservations = [];
@@ -16,12 +17,12 @@ class ReservationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulation du chargement - à remplacer par un appel API réel
-      await Future.delayed(const Duration(seconds: 1));
-      // _reservations seront chargées depuis l'API
+      final List<dynamic> data = await BookingService.getMyBookings();
+      _reservations.clear();
+      _reservations.addAll(data.map((json) => Reservation.fromJson(json)).toList());
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors du chargement des réservations';
+      _error = 'Erreur lors du chargement des réservations : $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -34,12 +35,11 @@ class ReservationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Appel API pour créer la réservation
-      await Future.delayed(const Duration(seconds: 1));
+      await BookingService.createBooking(reservation.toJson());
       _reservations.add(reservation);
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors de la création de la réservation';
+      _error = 'Erreur lors de la création de la réservation : $e';
     } finally {
       _isLoading = false;
       notifyListeners();

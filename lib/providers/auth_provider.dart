@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
+import '../services/auth_service.dart';
 import 'package:uuid/uuid.dart';
 
 class AddressModel {
@@ -35,6 +36,27 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
   List<AddressModel> get addresses => _addresses;
   String? get profilePhotoPath => _profilePhotoPath;
+
+  AuthProvider() {
+    _checkStatus();
+  }
+
+  Future<void> _checkStatus() async {
+    final loggedIn = await AuthService.isLoggedIn();
+    if (loggedIn) {
+      await fetchCurrentUser();
+    }
+  }
+
+  Future<void> fetchCurrentUser() async {
+    try {
+      final userData = await AuthService.getMe();
+      _currentUser = User.fromJson(userData);
+      notifyListeners();
+    } catch (e) {
+      await logout();
+    }
+  }
 
   void updateUser({String? firstName, String? lastName, String? email}) {
     if (_currentUser != null) {
@@ -83,18 +105,15 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulation de la connexion
-      await Future.delayed(const Duration(seconds: 1));
-      _currentUser = User(
-        id: '1',
-        email: email,
-        firstName: 'Nom',
-        lastName: 'Utilisateur',
-        role: UserRole.tourist,
-      );
-      _error = null;
+      final success = await AuthService.login(email, password);
+      if (success) {
+        await fetchCurrentUser();
+        _error = null;
+      } else {
+        _error = 'Identifiants incorrects';
+      }
     } catch (e) {
-      _error = 'Erreur lors de la connexion';
+      _error = 'Erreur lors de la connexion : $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -102,6 +121,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    await AuthService.logout();
     _currentUser = null;
     notifyListeners();
   }
@@ -117,18 +137,15 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulation de l'inscription
-      await Future.delayed(const Duration(seconds: 1));
-      _currentUser = User(
-        id: '2',
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        role: UserRole.tourist,
-      );
-      _error = null;
+      final success = await AuthService.register(email, password, '$firstName $lastName');
+      if (success) {
+        await login(email, password);
+        _error = null;
+      } else {
+        _error = 'Échec de l\'inscription';
+      }
     } catch (e) {
-      _error = 'Erreur lors de l\'inscription';
+      _error = 'Erreur lors de l\'inscription : $e';
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
+import '../services/review_service.dart';
+import '../services/api_service.dart';
+import '../constants/api_constants.dart';
+
 
 class ReviewProvider extends ChangeNotifier {
   final List<Review> _reviews = [];
@@ -16,12 +20,12 @@ class ReviewProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulation du chargement
-      await Future.delayed(const Duration(seconds: 1));
-      // _reviews seront chargées depuis l'API
+      final List<dynamic> data = await ApiService.get('${ApiConstants.reviews}?destinationId=$destinationId');
+      _reviews.clear();
+      _reviews.addAll(data.map((json) => Review.fromJson(json)).toList());
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors du chargement des avis';
+      _error = 'Erreur lors du chargement des avis : $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -34,11 +38,11 @@ class ReviewProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      await ReviewService.addReview(review.toJson());
       _reviews.add(review);
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors de l\'ajout de l\'avis';
+      _error = 'Erreur lors de l\'ajout de l\'avis : $e';
     } finally {
       _isLoading = false;
       notifyListeners();

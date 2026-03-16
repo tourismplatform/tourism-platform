@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class Destination {
   final String id;
   final String name;
@@ -27,17 +29,21 @@ class Destination {
 
   factory Destination.fromJson(Map<String, dynamic> json) {
     return Destination(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? json['nom'] ?? '',
       description: json['description'] ?? '',
-      location: json['location'] ?? '',
-      category: json['category'] ?? '',
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      numberOfReviews: json['numberOfReviews'] ?? 0,
-      pricePerPerson: (json['pricePerPerson'] ?? 0.0).toDouble(),
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
-      mapUrl: json['mapUrl'] ?? '',
-      isActive: json['isActive'] ?? true,
+      location: json['location'] ?? json['adresse'] ?? '',
+      category: json['category'] ?? json['categorie'] ?? '',
+      rating: (json['avg_rating'] ?? json['rating'] ?? json['note'] ?? 0.0).toDouble(),
+      numberOfReviews: json['numberOfReviews'] ?? json['number_of_reviews'] ?? json['nb_avis'] ?? 0,
+      pricePerPerson: (json['price_per_person'] ?? json['pricePerPerson'] ?? json['price_per_person'] ?? json['prix_par_personne'] ?? 0.0).toDouble(),
+      imageUrls: json['images'] != null 
+          ? List<String>.from(json['images']) 
+          : (json['imageUrls'] != null 
+              ? List<String>.from(json['imageUrls']) 
+              : (json['image_urls'] != null ? List<String>.from(json['image_urls']) : [])),
+      mapUrl: json['mapUrl'] ?? json['map_url'] ?? '',
+      isActive: json['isActive'] ?? json['is_active'] ?? true,
     );
   }
 

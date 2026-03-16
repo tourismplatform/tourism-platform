@@ -1,5 +1,20 @@
 enum UserRole { tourist, admin }
 
+extension UserRoleExtension on UserRole {
+  static UserRole fromString(String role) {
+    switch (role.toUpperCase()) {
+      case 'ADMIN':
+        return UserRole.admin;
+      default:
+        return UserRole.tourist;
+    }
+  }
+
+  String toShortString() {
+    return toString().split('.').last.toUpperCase();
+  }
+}
+
 class User {
   final String id;
   final String email;
@@ -26,7 +41,7 @@ class User {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       phoneNumber: json['phoneNumber'],
-      role: UserRole.values[json['role'] ?? 0],
+      role: UserRoleExtension.fromString(json['role'] ?? 'TOURIST'),
     );
   }
 
@@ -37,7 +52,7 @@ class User {
       'firstName': firstName,
       'lastName': lastName,
       'phoneNumber': phoneNumber,
-      'role': role.index,
+      'role': role.toShortString(),
     };
   }
 }

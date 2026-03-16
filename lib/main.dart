@@ -7,7 +7,11 @@ import 'screens/auth/register_screen.dart';
 import 'screens/user/index.dart';
 import 'screens/user/settings_screen.dart';
 
+import 'services/test_connection.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  testBackendConnection();
   runApp(const MyApp());
 }
 
