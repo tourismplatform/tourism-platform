@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../models/index.dart';
 import '../../providers/index.dart';
-import '../../providers/language_provider.dart';
+import '../../widgets/index.dart';
 
 class MyReservationsScreen extends StatefulWidget {
   const MyReservationsScreen({super.key});
@@ -25,7 +25,6 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
   @override
   Widget build(BuildContext context) {
     final langProvider = Provider.of<LanguageProvider>(context);
-
     return Consumer<ReservationProvider>(
       builder: (context, provider, _) {
         final pendingLength = provider.reservations.where((r) => r.status == ReservationStatus.pending).length;
@@ -35,6 +34,7 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
         return DefaultTabController(
           length: 3,
           child: Scaffold(
+            drawer: const AppDrawer(),
             appBar: AppBar(
               title: Text(langProvider.translate('my_reservations')),
               bottom: TabBar(
@@ -264,11 +264,11 @@ class _MyReservationsScreenState extends State<MyReservationsScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                final scaffoldMessenger = ScaffoldMessenger.of(context);
                 Provider.of<ReservationProvider>(context, listen: false)
                     .cancelReservation(id)
                     .then((_) {
-                  scaffoldMessenger.showSnackBar(
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(langProvider.translate('reservation_cancelled'))),
                   );
                 });
@@ -308,11 +308,9 @@ class _ReviewDialogWidgetState extends State<ReviewDialogWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final langProvider = Provider.of<LanguageProvider>(context);
-
     return AlertDialog(
       title: Text(
-        langProvider.translate('leave_review'),
+        'Laisser un avis',
         style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
       ),
       content: Column(
@@ -327,7 +325,7 @@ class _ReviewDialogWidgetState extends State<ReviewDialogWidget> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(langProvider.translate('rating'), style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+          Text('Note', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Row(
             children: List.generate(5, (index) {
@@ -343,7 +341,7 @@ class _ReviewDialogWidgetState extends State<ReviewDialogWidget> {
           ),
           const SizedBox(height: 16),
           Text(
-            langProvider.translate('comment'),
+            'Commentaire',
             style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
@@ -351,7 +349,7 @@ class _ReviewDialogWidgetState extends State<ReviewDialogWidget> {
             controller: _commentController,
             maxLines: 3,
             decoration: InputDecoration(
-              hintText: langProvider.translate('share_experience'),
+              hintText: 'Partagez votre expérience...',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -362,7 +360,7 @@ class _ReviewDialogWidgetState extends State<ReviewDialogWidget> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(langProvider.translate('cancel')),
+          child: const Text('Annuler'),
         ),
         ElevatedButton(
           onPressed: _rating > 0
@@ -370,7 +368,7 @@ class _ReviewDialogWidgetState extends State<ReviewDialogWidget> {
                   widget.onSubmit(_rating, _commentController.text);
                 }
               : null,
-          child: Text(langProvider.translate('send')),
+          child: const Text('Envoyer'),
         ),
       ],
     );

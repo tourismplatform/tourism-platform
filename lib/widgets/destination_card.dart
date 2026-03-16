@@ -44,7 +44,7 @@ class DestinationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -73,7 +73,7 @@ class DestinationCard extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.2),
+                    Colors.black.withValues(alpha: 0.1),
                     Colors.black.withValues(alpha: 0.8),
                   ],
                 ),

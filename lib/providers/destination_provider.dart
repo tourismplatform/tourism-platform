@@ -47,6 +47,12 @@ class DestinationProvider extends ChangeNotifier {
     _applyFilters();
   }
 
+  void resetFilter() {
+    _selectedCategory = 'Tous';
+    _searchQuery = '';
+    _applyFilters();
+  }
+
   void searchDestinations(String query) {
     _searchQuery = query;
     _applyFilters();

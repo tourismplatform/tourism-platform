@@ -1,4 +1,4 @@
-const String appName = 'TourbF';
+const String appName = 'ExplorerBF';
 const String appSubtitle = 'Découvrez le Burkina Faso';
 
 // Categories

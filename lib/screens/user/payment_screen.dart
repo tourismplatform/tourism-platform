@@ -221,9 +221,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: Colors.green,
           ),
-          onPressed: _isProcessing ? null : () => _processPayment(langProvider),
+          onPressed: _isProcessing ? null : _processPayment,
           child: _isProcessing
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
@@ -242,7 +242,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Future<void> _processPayment(LanguageProvider langProvider) async {
+  Future<void> _processPayment() async {
+    final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+
     if (_cardNumberController.text.isEmpty ||
         _cardHolderController.text.isEmpty ||
         _expiryController.text.isEmpty ||

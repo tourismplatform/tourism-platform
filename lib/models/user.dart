@@ -41,39 +41,3 @@ class User {
     };
   }
 }
-
-class Address {
-  final String id;
-  final String title;
-  final String subtitle;
-  final String iconStr;
-  final String colorStr;
-
-  Address({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    this.iconStr = 'location_on',
-    this.colorStr = 'blue',
-  });
-
-  factory Address.fromJson(Map<String, dynamic> json) {
-    return Address(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      subtitle: json['subtitle'] ?? '',
-      iconStr: json['iconStr'] ?? 'location_on',
-      colorStr: json['colorStr'] ?? 'blue',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'subtitle': subtitle,
-      'iconStr': iconStr,
-      'colorStr': colorStr,
-    };
-  }
-}

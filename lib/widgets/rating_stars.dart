@@ -7,16 +7,14 @@ class RatingStars extends StatelessWidget {
   final Function(int)? onRatingChanged;
   final bool isInteractive;
   final double size;
-  final Color color; // Added this line for the new 'color' property
 
   const RatingStars({
-    super.key, // Changed from Key? key,
+    super.key,
     required this.rating,
     this.numberOfReviews,
-    this.onRatingChanged, // Kept this parameter as it's a class member
-    this.isInteractive = false, // Kept this parameter as it's a class member
-    this.size = 16, // Changed default value from 20 to 16
-    this.color = Colors.amber, // Added this new parameter
+    this.onRatingChanged,
+    this.isInteractive = false,
+    this.size = 20,
   });
 
   @override

@@ -36,7 +36,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
   @override
   Widget build(BuildContext context) {
     final langProvider = Provider.of<LanguageProvider>(context);
-
     return Scaffold(
       appBar: AppBar(title: Text(langProvider.translate('book_destination'))),
       body: Consumer<DestinationProvider>(

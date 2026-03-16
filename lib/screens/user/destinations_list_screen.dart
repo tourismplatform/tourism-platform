@@ -26,91 +26,62 @@ class _DestinationsListScreenState extends State<DestinationsListScreen> {
   @override
   Widget build(BuildContext context) {
     final langProvider = Provider.of<LanguageProvider>(context);
-
     return Scaffold(
       drawer: const AppDrawer(),
+      appBar: AppBar(
+        title: Text(
+          langProvider.translate('all_destinations'),
+          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Consumer<DestinationProvider>(
         builder: (context, destinationProvider, _) {
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 120.0,
-                floating: true,
-                pinned: true,
-                elevation: 0,
-                backgroundColor: Theme.of(context).primaryColor,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
-                  title: Text(
-                    langProvider.translate('all_destinations'),
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+          return Column(
+            children: [
+              // Barre de recherche
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: langProvider.translate('search_destination'),
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              destinationProvider.searchDestinations('');
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  onChanged: (value) {
+                    destinationProvider.searchDestinations(value);
+                    setState(() {});
+                  },
                 ),
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      _viewMode == 'grid' ? Icons.view_list : Icons.dashboard,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _viewMode = _viewMode == 'grid' ? 'list' : 'grid';
-                      });
-                    },
-                  ),
-                ],
               ),
-              SliverToBoxAdapter(
-                child: Column(
+              // Filtres et Vue
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Barre de recherche
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: langProvider.translate('search_destination'),
-                          hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    destinationProvider.searchDestinations('');
-                                  },
-                                )
-                              : null,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          destinationProvider.searchDestinations(value);
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                    // Filtres
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: ['Tous', ...categories]
-                            .map(
-                              (category) {
-                                String displayLabel = langProvider.translate('all');
-                                if (category != 'Tous') {
-                                  displayLabel = langProvider.translate(category == 'Aventure' ? 'adventure' : category.toLowerCase());
-                                }
-                                return Padding(
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: ['Tous', ...categories]
+                              .map(
+                                (category) => Padding(
                                   padding: const EdgeInsets.only(right: 8),
                                   child: CategoryChip(
-                                    label: displayLabel,
+                                    label: category == 'Tous' ? langProvider.translate('all') : langProvider.translate(category.toLowerCase()),
                                     isSelected: _selectedCategory == category,
                                     onTap: () {
                                       setState(() {
@@ -121,81 +92,66 @@ class _DestinationsListScreenState extends State<DestinationsListScreen> {
                                       );
                                     },
                                   ),
-                                );
-                              },
-                            )
-                            .toList(),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    IconButton(
+                      icon: Icon(
+                        _viewMode == 'grid' ? Icons.view_list : Icons.dashboard,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _viewMode = _viewMode == 'grid' ? 'list' : 'grid';
+                        });
+                      },
+                    ),
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
               // Liste des destinations
-              if (destinationProvider.isLoading)
-                const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else if (destinationProvider.destinations.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.location_off,
-                          size: 64,
-                          color: Colors.grey[400],
+              Expanded(
+                child: destinationProvider.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : destinationProvider.destinations.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.location_off,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              langProvider.translate('no_destination'),
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          langProvider.translate('no_destination'),
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else if (_viewMode == 'grid')
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final destination = destinationProvider.destinations[index];
-                        return DestinationCard(
-                          destination: destination,
-                          onTap: () {
-                            Navigator.of(context).pushNamed(
-                              '/destination-detail',
-                              arguments: destination.id,
-                            );
-                          },
-                        );
-                      },
-                      childCount: destinationProvider.destinations.length,
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final destination = destinationProvider.destinations[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: DestinationCard(
+                      )
+                    : _viewMode == 'grid'
+                    ? GridView.builder(
+                        padding: const EdgeInsets.all(16),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.75,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
+                        itemCount: destinationProvider.destinations.length,
+                        itemBuilder: (context, index) {
+                          final destination =
+                              destinationProvider.destinations[index];
+                          return DestinationCard(
                             destination: destination,
                             onTap: () {
                               Navigator.of(context).pushNamed(
@@ -203,13 +159,30 @@ class _DestinationsListScreenState extends State<DestinationsListScreen> {
                                 arguments: destination.id,
                               );
                             },
-                          ),
-                        );
-                      },
-                      childCount: destinationProvider.destinations.length,
-                    ),
-                  ),
-                ),
+                          );
+                        },
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: destinationProvider.destinations.length,
+                        itemBuilder: (context, index) {
+                          final destination =
+                              destinationProvider.destinations[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: DestinationCard(
+                              destination: destination,
+                              onTap: () {
+                                Navigator.of(context).pushNamed(
+                                  '/destination-detail',
+                                  arguments: destination.id,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+              ),
             ],
           );
         },

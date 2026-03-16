@@ -5,11 +5,7 @@ class ShimmerCard extends StatelessWidget {
   final double? height;
   final double? width;
 
-  const ShimmerCard({
-    super.key,
-    this.width = double.infinity,
-    this.height = 100,
-  });
+  const ShimmerCard({super.key, this.height = 200, this.width = double.infinity});
 
   @override
   Widget build(BuildContext context) {

@@ -19,7 +19,6 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final langProvider = Provider.of<LanguageProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(langProvider.translate('details')),
@@ -91,7 +90,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                             numberOfReviews: destination.numberOfReviews,
                           ),
                           Text(
-                            '${destination.pricePerPerson.toStringAsFixed(0)} CFA/pers',
+                            '${destination.pricePerPerson.toStringAsFixed(0)} CFA/${langProvider.translate('days_short')}',
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -145,7 +144,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                       ),
                       const SizedBox(height: 8),
                       Chip(
-                        label: Text(langProvider.translate(destination.category == 'Aventure' ? 'adventure' : destination.category.toLowerCase())),
+                        label: Text(langProvider.translate(destination.category.toLowerCase())),
                         backgroundColor: Colors.blue[100],
                         labelStyle: GoogleFonts.poppins(
                           color: Colors.blue[900],
@@ -271,7 +270,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Text(
-                    langProvider.translate(destination.category == 'Aventure' ? 'adventure' : destination.category.toLowerCase()),
+                    langProvider.translate(destination.category.toLowerCase()),
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
