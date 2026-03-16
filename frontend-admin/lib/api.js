@@ -93,3 +93,4 @@ export async function uploadImage(file) {
   if (!res.ok) throw new Error(data.message || "Upload échoué");
   return data.url;
 }
+

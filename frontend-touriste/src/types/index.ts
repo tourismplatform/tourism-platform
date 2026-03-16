@@ -18,6 +18,7 @@ export interface Destination {
 }
 
 export interface User {
+ 
   id: string;
   name: string;
   email: string;
@@ -25,6 +26,7 @@ export interface User {
   phone?: string;  // Ajoute cette ligne
   avatar?: string; // Ajoute aussi avatar car tu l'utilises dans profile/page.tsx
 }
+
 
 export interface Booking {
   id: string;

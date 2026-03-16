@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
-import api from "@/lib/api";
+import { api, authAPI, adminAPI } from "@/lib/api";
 
 export default function AdminProfilePage() {
   const router = useRouter();
