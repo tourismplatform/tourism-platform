@@ -1,272 +1,226 @@
-# 🌍 Tourism Platform — Backend API
+# 🌍 Tourism Platform — Burkina Faso
 
-API REST du projet **Tourism Promotion Platform** développée avec NestJS et Supabase.
+Plateforme touristique complète pour la découverte et la réservation de destinations au Burkina Faso.
+
+## Architecture
+
+```
+tourism-platform/
+├── backend/              ← API REST NestJS    (port 3001)
+├── frontend-touriste/    ← App client Next.js (port 3000)
+└── frontend-admin/       ← Dashboard admin    (port 3002)
+```
+
+## Prérequis
+
+Avant de commencer, assurez-vous d'avoir installé :
+
+- **Node.js** v18+ → [nodejs.org](https://nodejs.org)
+- **npm** v9+
+- Un compte **Supabase** → [supabase.com](https://supabase.com) *(demandez les clés à l'équipe)*
 
 ---
 
-## 📋 Description
+## 📥 Cloner le projet
 
-Backend de la plateforme touristique permettant de :
-- Gérer les destinations touristiques
-- Effectuer des réservations avec paiement simulé
-- Laisser des avis sur les destinations
-- Administrer la plateforme via un dashboard
+```bash
+git clone https://github.com/<votre-org>/tourism-platform.git
+cd tourism-platform
+```
+
+---
+
+## ⚙️ 1. Backend (API NestJS)
+
+### Installation
+
+```bash
+cd backend
+npm install
+```
+
+### Configuration de l'environnement
+
+Copiez le fichier d'exemple et remplissez les valeurs :
+
+```bash
+cp .env.example .env
+```
+
+Ouvrez `.env` et renseignez :
+
+```env
+# Supabase — demandez ces valeurs à l'équipe
+SUPABASE_URL=https://xxxx.supabase.co
+SUPABASE_KEY=votre_anon_key_supabase
+
+# JWT — utilisez la même clé que les autres membres de l'équipe
+JWT_SECRET=tourism_platform_secret_2026
+JWT_EXPIRES_IN=24h
+
+# Serveur
+PORT=3001
+NODE_ENV=development
+```
+
+> 💡 **SUPABASE_URL** et **SUPABASE_KEY** se trouvent dans votre projet Supabase → *Settings > API*
+
+### Lancer le serveur
+
+```bash
+# Mode développement (rechargement auto)
+npm run start:dev
+```
+
+✅ API disponible sur : **http://localhost:3001/api**  
+📚 Documentation Swagger : **http://localhost:3001/api/docs**
+
+---
+
+## 🌐 2. Frontend Touriste (App Client)
+
+### Installation
+
+```bash
+cd frontend-touriste
+npm install
+```
+
+### Configuration de l'environnement
+
+```bash
+cp .env.local.example .env.local
+```
+
+Si le fichier `.env.local.example` n'existe pas, créez manuellement `.env.local` :
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
+
+### Lancer l'app
+
+```bash
+npm run dev
+```
+
+✅ App disponible sur : **http://localhost:3000**
+
+---
+
+## 🛠️ 3. Frontend Admin (Dashboard)
+
+### Installation
+
+```bash
+cd frontend-admin
+npm install
+```
+
+### Configuration de l'environnement
+
+Créez le fichier `.env.local` :
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
+
+### Lancer l'app
+
+```bash
+npm run dev
+```
+
+✅ Dashboard disponible sur : **http://localhost:3002**
+
+---
+
+## 🚀 Démarrage complet (3 terminaux)
+
+Ouvrez **3 terminaux** et lancez dans l'ordre :
+
+```bash
+# Terminal 1 — Backend
+cd backend && npm run start:dev
+
+# Terminal 2 — Frontend Touriste
+cd frontend-touriste && npm run dev
+
+# Terminal 3 — Frontend Admin
+cd frontend-admin && npm run dev
+```
+
+---
+
+## 🧪 Tester l'application
+
+### Créer un compte touriste
+
+1. Aller sur **http://localhost:3000/register**
+2. Remplir le formulaire et créer un compte
+3. Se connecter sur **http://localhost:3000/login**
+
+### Accéder au dashboard admin
+
+Pour tester les fonctionnalités admin, votre compte doit avoir le rôle `ADMIN`.  
+Exécutez cette requête SQL dans Supabase (Table Editor ou SQL Editor) :
+
+```sql
+UPDATE users SET role = 'ADMIN' WHERE email = 'votre@email.com';
+```
+
+Ensuite, reconnectez-vous et ouvrez **http://localhost:3002**.
+
+### Explorer la documentation API
+
+La documentation complète Swagger est disponible à :
+**http://localhost:3001/api/docs**
+
+Cliquez sur **Authorize** et collez votre token JWT (obtenu après login) pour tester les endpoints protégés.
+
+---
+
+## 📌 Ports utilisés
+
+| Service | Port | URL |
+|---|---|---|
+| API Backend | 3001 | http://localhost:3001/api |
+| Swagger Docs | 3001 | http://localhost:3001/api/docs |
+| Frontend Touriste | 3000 | http://localhost:3000 |
+| Frontend Admin | 3002 | http://localhost:3002 |
+
+---
+
+## 📂 Structure des modules Backend
+
+| Module | Endpoints principaux |
+|---|---|
+| **Auth** | Inscription, connexion, profil |
+| **Destinations** | Liste, détail, CRUD admin, upload images |
+| **Bookings** | Créer réservation, mes réservations, gestion admin |
+| **Payments** | Paiement mock (XOF/FCFA), remboursement |
+| **Reviews** | Avis (après séjour complété), modération admin |
+| **Admin** | Statistiques, gestion utilisateurs, rôles |
+
+---
+
+## 🛑 Problèmes fréquents
+
+**`CORS error` dans le navigateur**  
+→ Vérifiez que le backend tourne bien sur le port **3001**.
+
+**`401 Unauthorized` sur les requêtes**  
+→ Votre token JWT a expiré (durée : 24h). Reconnectez-vous.
+
+**Page admin inaccessible**  
+→ Votre compte n'a pas le rôle `ADMIN`. Voir la section "Accéder au dashboard admin" ci-dessus.
+
+**`Cannot find module` ou erreurs de démarrage**  
+→ Relancez `npm install` dans le dossier concerné.
 
 ---
 
 ## 👥 Équipe
 
-| Nom | Rôle | Branche |
-|---|---|---|
-| NANA Marc | Chef de projet + Backend | `feature/auth` |
-| NITIEMA Eddy | Backend | `feature/api` |
-| OUEDRAOGO Alimata | Frontend Web Touriste | `feature/web-touriste` |
-| ILBOUDO Balkissa | Frontend Web Admin | `feature/web-admin` |
-| OUEDRAOGO Corneille | Mobile Flutter | `feature/flutter` |
-
----
-
-## 🛠️ Stack technique
-
-- **Framework** : NestJS (Node.js + TypeScript)
-- **Base de données** : Supabase (PostgreSQL)
-- **Authentification** : JWT
-- **Validation** : class-validator
-- **Paiement** : Mock (simulé)
-
----
-
-## 🚀 Installation et lancement
-
-### Prérequis
-- Node.js v18+
-- npm v9+
-- Un compte Supabase
-
-### 1. Cloner le repo
-```bash
-git clone https://github.com/NANA-MARC/tourism-platform.git
-cd tourism-platform/backend
-```
-
-### 2. Aller sur sa branche
-```bash
-# Eddy
-git checkout feature/api
-
-# Marc
-git checkout feature/auth
-```
-
-### 3. Installer les dépendances
-```bash
-npm install
-```
-
-### 4. Configurer les variables d'environnement
-```bash
-cp .env.example .env
-nano .env
-```
-
-Remplis les valeurs :
-```env
-SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
-SUPABASE_KEY=sb_publishable_xxxxxxxxxxxx
-JWT_SECRET=tourism_platform_secret_2026
-JWT_EXPIRES_IN=24h
-PORT=3001
-NODE_ENV=development
-```
-
-### 5. Lancer le serveur
-```bash
-npm run start
-```
-
-Le serveur tourne sur : `http://localhost:3001/api`
-
----
-
-## 📡 Endpoints disponibles
-
-### Auth
-| Méthode | Endpoint | Accès | Description |
-|---|---|---|---|
-| POST | `/api/auth/register` | Public | Inscription |
-| POST | `/api/auth/login` | Public | Connexion |
-| GET | `/api/auth/me` | Auth | Profil connecté |
-
-### Destinations (Eddy)
-| Méthode | Endpoint | Accès | Description |
-|---|---|---|---|
-| GET | `/api/destinations` | Public | Liste avec filtres |
-| GET | `/api/destinations/:id` | Public | Détail |
-| POST | `/api/admin/destinations` | Admin | Créer |
-| PUT | `/api/admin/destinations/:id` | Admin | Modifier |
-| DELETE | `/api/admin/destinations/:id` | Admin | Supprimer |
-
-### Bookings (Eddy)
-| Méthode | Endpoint | Accès | Description |
-|---|---|---|---|
-| POST | `/api/bookings` | Auth | Créer une réservation |
-| GET | `/api/bookings/my` | Auth | Mes réservations |
-| GET | `/api/admin/bookings` | Admin | Toutes les réservations |
-| PUT | `/api/admin/bookings/:id` | Admin | Confirmer/Annuler |
-
-### Payments (Eddy)
-| Méthode | Endpoint | Accès | Description |
-|---|---|---|---|
-| POST | `/api/payments/process` | Auth | Paiement simulé |
-| GET | `/api/payments/:bookingId` | Auth | Statut paiement |
-
-### Reviews (Eddy)
-| Méthode | Endpoint | Accès | Description |
-|---|---|---|---|
-| POST | `/api/reviews` | Auth | Laisser un avis |
-| GET | `/api/reviews/:destId` | Public | Avis d'une destination |
-| DELETE | `/api/admin/reviews/:id` | Admin | Supprimer un avis |
-
-### Admin
-| Méthode | Endpoint | Accès | Description |
-|---|---|---|---|
-| GET | `/api/admin/stats` | Admin | Statistiques globales |
-| GET | `/api/admin/users` | Admin | Liste utilisateurs |
-
----
-
-## 🔐 Authentification
-
-Toutes les routes protégées nécessitent un token JWT dans le header :
-
-```
-Authorization: Bearer <token>
-```
-
-Le token est obtenu après login ou register.
-
-**Rôles disponibles :**
-- `TOURIST` — attribué automatiquement à l'inscription
-- `ADMIN` — attribué manuellement via Supabase
-
----
-
-## 📦 Format des réponses
-
-### Succès
-```json
-{
-  "data": { ... },
-  "message": "Description du succès"
-}
-```
-
-### Erreur
-```json
-{
-  "error": "Description de l'erreur",
-  "statusCode": 400
-}
-```
-
----
-
-## 🗄️ Structure de la base de données
-
-```
-users               → Utilisateurs (TOURIST / ADMIN)
-destinations        → Destinations touristiques
-destination_images  → Photos des destinations
-bookings            → Réservations
-payments            → Paiements simulés
-reviews             → Avis des touristes
-```
-
----
-
-## 📁 Structure du projet
-
-```
-backend/
-└── src/
-    ├── auth/               ← Marc (register, login, JWT)
-    │   ├── dto/
-    │   ├── auth.controller.ts
-    │   ├── auth.service.ts
-    │   └── auth.module.ts
-    ├── destinations/       ← Eddy
-    ├── bookings/           ← Eddy
-    ├── payments/           ← Eddy
-    ├── reviews/            ← Eddy
-    ├── common/
-    │   ├── guards/         ← JwtAuthGuard
-    │   ├── decorators/
-    │   └── filters/
-    ├── supabase.service.ts
-    ├── app.module.ts
-    └── main.ts
-```
-
----
-
-## 🌿 Règles Git
-
-```
-main          → Code final livrable (Marc valide)
-develop       → Intégration quotidienne
-feature/auth  → Marc
-feature/api   → Eddy
-```
-
-**Convention de commits :**
-```
-feat:   Nouvelle fonctionnalité
-fix:    Correction de bug
-style:  Modification visuelle
-docs:   Documentation
-chore:  Configuration/setup
-```
-
-**Exemple :**
-```bash
-git commit -m "feat: ajouter CRUD destinations"
-```
-
----
-
-## ⚠️ Règles importantes
-
-- Ne jamais commiter le fichier `.env`
-- Ne jamais pusher directement sur `main`
-- Toute modification du Contrat API → informer toute l'équipe
-- Commit au moins 1 fois par demi-journée
-- Bloqué plus de 1h → message direct à Marc
-
----
-
-## 🧪 Tester l'API
-
-### Register
-```bash
-curl -X POST http://localhost:3001/api/auth/register \
--H "Content-Type: application/json" \
--d '{"name": "Test User", "email": "test@test.com", "password": "Test2026"}'
-```
-
-### Login
-```bash
-curl -X POST http://localhost:3001/api/auth/login \
--H "Content-Type: application/json" \
--d '{"email": "test@test.com", "password": "Test2026"}'
-```
-
-### GetMe (avec token)
-```bash
-curl http://localhost:3001/api/auth/me \
--H "Authorization: Bearer <ton_token>"
-```
-
----
-
-*Document maintenu par NANA Marc — Chef de projet*  
-*Mars 2026*
+Projet développé dans le cadre du tourisme numérique au Burkina Faso.  
+Pour toute question, contactez le lead technique de l'équipe.
