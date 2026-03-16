@@ -27,10 +27,30 @@ async function request(method, path, body = null) {
   return data;
 }
 
+export const api = {
+  get:       (path)      => request("GET",    path),
+  post:      (path, b)   => request("POST",   path, b),
+  put:       (path, b)   => request("PUT",    path, b),
+  delete:    (path)      => request("DELETE", path),
+};
+
 export const authAPI = {
   login:    (b) => request("POST", "/auth/login", b),
   register: (b) => request("POST", "/auth/register", b),
   me:       ()  => request("GET",  "/auth/me"),
+  updateProfile: (b) => request("PUT", "/auth/profile", b),
+  uploadAvatar: (formData) => {
+    const token = getToken();
+    return fetch(`${BASE_URL}/auth/upload-avatar`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    }).then(async res => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Upload échoué");
+      return data;
+    });
+  },
 };
 
 export const adminAPI = {

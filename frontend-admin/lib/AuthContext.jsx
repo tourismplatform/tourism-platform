@@ -38,11 +38,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (userData) => {
+    // Mettre à jour les infos utilisateur et les cookies
+    setUser(userData);
+    // Mettre à jour le cookie user avec les nouvelles données
+    document.cookie = `user=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=86400`;
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
       login,
       logout,
+      updateUser,
       isAdmin:    user?.role === "ADMIN",
       isTouriste: user?.role === "TOURIST",
       loading,

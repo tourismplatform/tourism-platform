@@ -10,6 +10,7 @@ const NAV = [
   { href:"/admin/bookings",     icon:"📅", label:"Réservations" },
   { href:"/admin/reviews",      icon:"⭐", label:"Avis" },
   { href:"/admin/users",        icon:"👥", label:"Utilisateurs" },
+  { href:"/admin/profile",      icon:"👤", label:"Mon Profil" },
 ];
 
 export default function AdminLayout({ children }) {
@@ -19,7 +20,7 @@ export default function AdminLayout({ children }) {
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "ADMIN")) {
-      window.location.href = "http://localhost:3000/login";
+      window.location.href = "http://localhost:3002/login";
     }
   }, [user, loading]);
 
@@ -67,18 +68,18 @@ export default function AdminLayout({ children }) {
 
         {/* User */}
         <div style={{ padding:"16px 20px", borderTop:"1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-            <div style={{ width:34, height:34, borderRadius:"50%", background:"var(--blue-600)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14 }}>
-              {user?.name?.charAt(0).toUpperCase() || "A"}
+          <Link href="/admin/profile" style={{ textDecoration: 'none' }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer", padding:"8px", borderRadius:"8px", transition:"background 0.2s", ":hover": { background: "rgba(255,255,255,0.05)" } }}>
+              <div style={{ width:34, height:34, borderRadius:"50%", background:"var(--blue-600)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14 }}>
+                {user?.name?.charAt(0).toUpperCase() || "A"}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize:13, fontWeight:600, color:"var(--white)" }}>{user?.name || "Administrateur"}</div>
+                <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>{user?.email}</div>
+              </div>
+              <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>→</div>
             </div>
-            <div>
-              <div style={{ fontSize:13, fontWeight:600, color:"var(--white)" }}>{user?.name || "Administrateur"}</div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>{user?.email}</div>
-            </div>
-          </div>
-          <button onClick={() => { if(logout) logout(); window.location.href = "http://localhost:3000/login"; }} style={{ width:"100%", padding:"8px", borderRadius:8, fontSize:12, fontWeight:600, background:"rgba(220,38,38,0.15)", border:"1px solid rgba(220,38,38,0.3)", color:"#fca5a5", cursor:"pointer", fontFamily:"var(--font-body)" }}>
-            🚪 Se déconnecter
-          </button>
+          </Link>
         </div>
       </aside>
 

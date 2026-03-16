@@ -31,7 +31,7 @@ export class AdminService {
   async getUsers() {
     const client = this.supabase.getClient();
     const { data, error } = await client
-      .from('users').select('id, email, role, created_at')
+      .from('users').select('id, name, email, role, avatar, phone, created_at')
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);

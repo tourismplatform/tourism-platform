@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SupabaseService } from '../supabase.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { UploadService } from '../common/services/upload.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SupabaseService, JwtAuthGuard],
+  providers: [AuthService, SupabaseService, JwtAuthGuard, UploadService],
   exports: [JwtAuthGuard, JwtModule],
 })
 export class AuthModule {}

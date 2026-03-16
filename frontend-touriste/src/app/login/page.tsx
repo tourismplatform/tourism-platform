@@ -32,6 +32,7 @@ export default function LoginPage() {
     try {
       const res = await api.post('/auth/login', { email, password });
       const { token, user } = res.data.data;
+      
 Cookies.set('token', token, { expires: 1 });
 Cookies.set('user', JSON.stringify(user), { expires: 1 });
 login(user, token);

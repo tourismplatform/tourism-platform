@@ -9,17 +9,24 @@ export default function ProfilePage() {
   const { user, isAuthenticated, logout, login } = useAuthStore();
   const [bookings, setBookings] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: '', currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [form, setForm] = useState({ name: '', phone: '', currentPassword: '', newPassword: '', confirmPassword: '' });
   const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
   const [saving, setSaving] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) { router.push('/login'); return; }
-    setForm(f => ({ ...f, name: user?.name || '' }));
+    setForm(f => ({ 
+      ...f, 
+      name: user?.name || '', 
+      phone: user?.phone || '' 
+    }));
+    setAvatarPreview(user?.avatar || null);
     api.get('/bookings/my')
       .then(res => setBookings(res.data.data || []))
       .catch(() => setBookings([]));
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   const stats = {
     total: bookings.length,
@@ -36,19 +43,55 @@ export default function ProfilePage() {
       return setMessage({ type: 'error', text: 'Les mots de passe ne correspondent pas' });
     setSaving(true);
     try {
-      const payload: any = { name: form.name };
+      const payload: any = { name: form.name, phone: form.phone };
       if (form.newPassword) {
         payload.currentPassword = form.currentPassword;
         payload.newPassword = form.newPassword;
       }
       const res = await api.put('/auth/profile', payload);
-      login({ ...user!, name: form.name }, '');
+      login({ ...user!, name: form.name, phone: form.phone }, '');
       setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
       setEditing(false);
     } catch (err: any) {
       setMessage({ type: 'error', text: err.response?.data?.message || 'Erreur lors de la mise à jour' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validation du type de fichier
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: 'Seules les images sont autorisées' });
+      return;
+    }
+
+    // Validation de la taille (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'Fichier trop volumineux. Maximum 5MB.' });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await api.post('/auth/upload-avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const newAvatarUrl = res.data.data.avatar;
+      setAvatarPreview(newAvatarUrl);
+      login({ ...user!, avatar: newAvatarUrl }, '');
+      setMessage({ type: 'success', text: 'Avatar mis à jour avec succès !' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Erreur lors de l\'upload' });
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -67,12 +110,36 @@ export default function ProfilePage() {
 
         {/* Avatar + infos */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
-          <div style={{ width: 76, height: 76, background: 'linear-gradient(135deg, #1a4fd6, #ff5722)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.8rem', flexShrink: 0 }}>
-            {initials}
+          <div style={{ position: 'relative', width: 76, height: 76, flexShrink: 0 }}>
+            {avatarPreview ? (
+              <img 
+                src={avatarPreview} 
+                alt="Avatar" 
+                style={{ width: 76, height: 76, borderRadius: '50%', objectFit: 'cover' }}
+              />
+            ) : (
+              <div style={{ width: 76, height: 76, background: 'linear-gradient(135deg, #1a4fd6, #ff5722)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.8rem' }}>
+                {initials}
+              </div>
+            )}
+            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: -2, right: -2, background: '#1a4fd6', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid white' }}>
+              <span style={{ color: 'white', fontSize: '12px' }}>📷</span>
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              disabled={uploadingAvatar}
+              style={{ display: 'none' }}
+            />
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: '1.2rem', color: '#0a0f1e' }}>{user?.name}</div>
             <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 6 }}>{user?.email}</div>
+            {user?.phone && (
+              <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 6 }}>📞 {user.phone}</div>
+            )}
             <span style={{ background: '#eff6ff', color: '#1a4fd6', padding: '2px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>
               {user?.role === 'ADMIN' ? '👑 Administrateur' : '🧭 Touriste'}
             </span>
@@ -98,6 +165,12 @@ export default function ProfilePage() {
               <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
             </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 6 }}>Téléphone</label>
+              <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                placeholder="+226 00 00 00 00"
+                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
+            </div>
             <div style={{ borderTop: '1px solid #f4f6fa', paddingTop: 14 }}>
               <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 12 }}>Changer le mot de passe (optionnel)</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -119,6 +192,7 @@ export default function ProfilePage() {
             {[
               { label: 'Nom complet', value: user?.name },
               { label: 'Email', value: user?.email },
+              { label: 'Téléphone', value: user?.phone || 'Non renseigné' },
               { label: 'Rôle', value: user?.role },
             ].map(item => (
               <div key={item.label} style={{ borderBottom: '1px solid #f4f6fa', padding: '12px 0', display: 'flex', justifyContent: 'space-between' }}>

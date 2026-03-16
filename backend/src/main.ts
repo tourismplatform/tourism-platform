@@ -14,7 +14,12 @@ async function bootstrap() {
   }));
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3002'],
+    origin: [
+      'http://localhost:3000', 
+      'http://localhost:3002',
+      'http://10.16.167.248:3000', // IP locale pour Flutter
+      'http://10.16.167.248:3002', // IP locale pour Flutter admin
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });
