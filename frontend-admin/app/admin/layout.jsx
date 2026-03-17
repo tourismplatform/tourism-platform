@@ -18,25 +18,27 @@ export default function AdminLayout({ children }) {
   const router   = useRouter();
   const pathname = usePathname();
 
-  // useEffect 1 - GARDE celui-ci (récupère token depuis URL)
-useEffect(() => {
+  useEffect(() => {
   if (typeof window !== 'undefined') {
+    // Étape 1 : récupère token depuis URL si venant du portail touriste
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     const userParam = params.get('user');
+    
     if (token && userParam) {
       document.cookie = `token=${token}; path=/`;
       document.cookie = `user=${encodeURIComponent(userParam)}; path=/`;
       window.history.replaceState({}, '', '/admin');
+      // On recharge pour que AuthContext relise les cookies
+      window.location.reload();
+      return;
     }
-  }
-}, []);
 
-// useEffect 2 - AJOUTE celui-ci après (redirige si pas admin)
-useEffect(() => {
-  if (!loading && (!user || user.role !== "ADMIN")) {
-    const touristeUrl = process.env.NEXT_PUBLIC_TOURISTE_URL || 'http://localhost:3000';
-    window.location.href = `${touristeUrl}/login`;
+    // Étape 2 : vérifie si connecté après chargement
+    if (!loading && (!user || user.role !== "ADMIN")) {
+      const touristeUrl = process.env.NEXT_PUBLIC_TOURISTE_URL || 'http://localhost:3000';
+      window.location.href = `${touristeUrl}/login`;
+    }
   }
 }, [user, loading]);
 
