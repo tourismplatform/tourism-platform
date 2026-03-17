@@ -105,8 +105,8 @@ function BookingContent() {
             <div style={{ background: '#f4f6fa', borderRadius: 12, padding: 20, marginBottom: 24 }}>
               {[
                 ['Destination', destinationName],
-                ['Arrivée', new Date(check_in).toLocaleDateString('fr-FR')],
-                ['Départ', new Date(check_out).toLocaleDateString('fr-FR')],
+                ['Arrivée', check_in ? new Date(check_in).toLocaleDateString('fr-FR') : '—'],
+                ['Départ', check_out ? new Date(check_out).toLocaleDateString('fr-FR') : '—'],
                 ['Personnes', `${nb_persons}`],
               ].map(([label, value]) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #e5e7eb' }}>
