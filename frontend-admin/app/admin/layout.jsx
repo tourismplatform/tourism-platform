@@ -20,7 +20,7 @@ export default function AdminLayout({ children }) {
 
   useEffect(() => {
     if (!loading && (!user || user.role !== "ADMIN")) {
-      window.location.href = "http://localhost:3002/login";
+      window.location.href = "http://localhost:3000/login";
     }
   }, [user, loading]);
 
