@@ -33,8 +33,8 @@ export default function LoginPage() {
       const res = await api.post('/auth/login', { email, password });
       const { token, user } = res.data.data;
       
-Cookies.set('token', token, { expires: 1 });
-Cookies.set('user', JSON.stringify(user), { expires: 1 });
+Cookies.set('token', token);
+Cookies.set('user', JSON.stringify(user));
 login(user, token);
 if (user.role === 'ADMIN') {
   window.location.href = 'http://localhost:3002/admin';

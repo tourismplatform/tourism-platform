@@ -34,7 +34,7 @@ export default function RegisterPage() {
         password: form.password,
       });
       const { token, user } = res.data.data;
-      Cookies.set('token', token, { expires: 1 });
+      Cookies.set('token', token);
       login(user, token);
       router.push('/');
     } catch (err: any) {

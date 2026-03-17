@@ -27,8 +27,8 @@ export const useAuthStore = create<AuthState>((set) => {
     isAuthenticated: !!token && !!user,
 
     login: (user, token) => {
-      Cookies.set('token', token, { expires: 7 }); 
-      Cookies.set('user', JSON.stringify(user), { expires: 7 });
+      Cookies.set('token', token); 
+      Cookies.set('user', JSON.stringify(user));
       set({ user, token, isAuthenticated: true });
     },
 

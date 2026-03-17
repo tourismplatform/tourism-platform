@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
     // Mettre à jour les infos utilisateur et les cookies
     setUser(userData);
     // Mettre à jour le cookie user avec les nouvelles données
-    document.cookie = `user=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=86400`;
+    document.cookie = `user=${encodeURIComponent(JSON.stringify(userData))}; path=/`;
   };
 
   return (
