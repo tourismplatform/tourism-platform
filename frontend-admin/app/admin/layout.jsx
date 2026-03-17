@@ -18,8 +18,8 @@ export default function AdminLayout({ children }) {
   const router   = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-  // Récupère token depuis URL si venant du portail touriste
+  // useEffect 1 - GARDE celui-ci (récupère token depuis URL)
+useEffect(() => {
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
@@ -27,11 +27,18 @@ export default function AdminLayout({ children }) {
     if (token && userParam) {
       document.cookie = `token=${token}; path=/`;
       document.cookie = `user=${encodeURIComponent(userParam)}; path=/`;
-      // Nettoie l'URL
       window.history.replaceState({}, '', '/admin');
     }
   }
 }, []);
+
+// useEffect 2 - AJOUTE celui-ci après (redirige si pas admin)
+useEffect(() => {
+  if (!loading && (!user || user.role !== "ADMIN")) {
+    const touristeUrl = process.env.NEXT_PUBLIC_TOURISTE_URL || 'http://localhost:3000';
+    window.location.href = `${touristeUrl}/login`;
+  }
+}, [user, loading]);
 
   if (loading || !user || user.role !== "ADMIN") {
     return (
