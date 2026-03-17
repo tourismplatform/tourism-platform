@@ -74,52 +74,52 @@ function BookingContent() {
   ];
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: '0 20px' }}>
+    <div style={{ maxWidth: 800, margin: 'clamp(20px, 5vw, 40px) auto', padding: '0 clamp(16px, 4vw, 20px)' }}>
 
       {/* ÉTAPES */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 40 }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 40, justifyContent: 'space-between' }}>
         {steps.map((s, i) => (
-          <div key={s.n} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? 1 : 0 }}>
+          <div key={s.n} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? 1 : 'none' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
               <div style={{
-                width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, fontSize: '0.9rem',
+                width: 'clamp(32px, 8vw, 40px)', height: 'clamp(32px, 8vw, 40px)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: '0.85rem',
                 background: step > s.n ? '#00875a' : step === s.n ? '#1a4fd6' : '#e5e7eb',
                 color: step >= s.n ? 'white' : '#6b7280'
               }}>
                 {step > s.n ? '✓' : s.n}
               </div>
-              <span style={{ fontSize: '0.78rem', color: step === s.n ? '#1a4fd6' : '#6b7280', fontWeight: step === s.n ? 700 : 400 }}>{s.label}</span>
+              <span style={{ fontSize: '0.7rem', color: step === s.n ? '#1a4fd6' : '#6b7280', fontWeight: step === s.n ? 700 : 400, textAlign: 'center' }}>{s.label}</span>
             </div>
-            {i < 2 && <div style={{ flex: 1, height: 2, background: step > s.n ? '#00875a' : '#e5e7eb', margin: '0 8px', marginBottom: 20 }} />}
+            {i < 2 && <div style={{ flex: 1, height: 2, background: step > s.n ? '#00875a' : '#e5e7eb', margin: '0 4px', marginBottom: 20 }} />}
           </div>
         ))}
       </div>
 
-      <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 24px rgba(10,15,30,0.08)', padding: 32 }}>
+      <div style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 24px rgba(10,15,30,0.08)', padding: 'clamp(20px, 5vw, 32px)' }}>
 
         {/* ÉTAPE 1 — Récapitulatif */}
         {step === 1 && (
           <>
             <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.8rem', fontWeight: 700, marginBottom: 24 }}>Récapitulatif</h2>
-            <div style={{ background: '#f4f6fa', borderRadius: 12, padding: 20, marginBottom: 24 }}>
+            <div style={{ background: '#f4f6fa', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
               {[
                 ['Destination', destinationName],
                 ['Arrivée', check_in ? new Date(check_in).toLocaleDateString('fr-FR') : '—'],
                 ['Départ', check_out ? new Date(check_out).toLocaleDateString('fr-FR') : '—'],
                 ['Personnes', `${nb_persons}`],
               ].map(([label, value]) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #e5e7eb' }}>
+                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #e5e7eb', flexWrap: 'wrap', gap: 8 }}>
                   <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>{label}</span>
                   <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{value}</span>
                 </div>
               ))}
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0 0', fontWeight: 700, fontSize: '1.1rem', color: '#1a4fd6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0 0', fontWeight: 700, fontSize: '1.1rem', color: '#1a4fd6' }}>
                 <span>Total</span>
                 <span>{total_price.toLocaleString()} FCFA</span>
               </div>
             </div>
-            <button onClick={() => setStep(2)} style={{ width: '100%', background: '#1a4fd6', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
+            <button onClick={() => setStep(2)} style={{ width: '100%', background: '#1a4fd6', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit' }}>
               Continuer vers le paiement →
             </button>
           </>
@@ -137,7 +137,7 @@ function BookingContent() {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 24 }}>
               {[{ icon: '💳', label: 'Carte bancaire' }, { icon: '📱', label: 'Mobile Money' }].map(m => (
                 <div key={m.label} style={{ border: '2px solid #1a4fd6', borderRadius: 12, padding: 16, textAlign: 'center', cursor: 'pointer', background: '#eff6ff' }}>
                   <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{m.icon}</div>
@@ -146,10 +146,10 @@ function BookingContent() {
               ))}
             </div>
 
-            <button onClick={doBookingAndPayment} disabled={loading} style={{ width: '100%', background: loading ? '#93c5fd' : '#ff5722', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
+            <button onClick={doBookingAndPayment} disabled={loading} style={{ width: '100%', background: loading ? '#93c5fd' : '#ff5722', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit' }}>
               {loading ? '⏳ Traitement en cours...' : '💳 Confirmer le paiement'}
             </button>
-            <button onClick={() => setStep(1)} style={{ width: '100%', background: 'transparent', border: 'none', color: '#6b7280', marginTop: 12, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'var(--font-outfit), sans-serif' }}>
+            <button onClick={() => setStep(1)} style={{ width: '100%', background: 'transparent', border: 'none', color: '#6b7280', marginTop: 12, cursor: 'pointer', fontSize: '0.88rem', fontFamily: 'inherit' }}>
               ← Retour
             </button>
           </>
@@ -162,16 +162,15 @@ function BookingContent() {
             <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, color: '#1a4fd6', marginBottom: 8 }}>
               Demande envoyée !
             </h2>
-            <p style={{ color: '#6b7280', marginBottom: 8, fontSize: '0.95rem' }}>Votre paiement a été reçu avec succès.</p>
+            <p style={{ color: '#6b7280', marginBottom: 16, fontSize: '0.95rem' }}>Votre paiement a été reçu avec succès.</p>
             <p style={{ color: '#0a0f1e', marginBottom: 8, fontWeight: 600, fontSize: '0.9rem' }}>Un administrateur va maintenant valider votre réservation d'ici peu.</p>
             <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 32 }}>Consultez la rubrique "Mes Réservations" pour suivre l'état de votre demande.</p>
-            <p style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: 24 }}>N° de transaction : <strong>#{txn}</strong></p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-              <button onClick={() => router.push('/my-bookings')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
-                Voir mes réservations
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => router.push('/my-bookings')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flex: '1 1 auto' }}>
+                Mes réservations
               </button>
-              <button onClick={() => router.push('/')} style={{ background: 'transparent', color: '#1a4fd6', border: '2px solid #1a4fd6', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
-                Retour à l'accueil
+              <button onClick={() => router.push('/')} style={{ background: 'transparent', color: '#1a4fd6', border: '2px solid #1a4fd6', padding: '12px 32px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', flex: '1 1 auto' }}>
+                Accueil
               </button>
             </div>
           </div>

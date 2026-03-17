@@ -26,14 +26,14 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div style={{ marginBottom:32 }}>
-        <h2 style={{ fontFamily:"var(--font-title)", fontSize:28, color:"var(--gray-900)", marginBottom:4 }}>
+      <div style={{ marginBottom:32, paddingTop: 'clamp(0px, 15vw, 40px)' }}>
+        <h2 style={{ fontFamily:"var(--font-title)", fontSize:'clamp(1.5rem, 5vw, 28px)', color:"var(--gray-900)", marginBottom:4 }}>
           Tableau de bord
         </h2>
         <p style={{ color:"var(--gray-400)", fontSize:14 }}>Vue d'ensemble de la plateforme en temps réel.</p>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:18, marginBottom:36 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:18, marginBottom:36 }}>
         {cards.map(c => (
           <div key={c.label} className="card" style={{ padding:24, display:"flex", gap:16, alignItems:"center" }}>
             <div style={{ width:50, height:50, borderRadius:12, background:c.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>
@@ -51,7 +51,8 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="card" style={{ overflow:"hidden" }}>
+      {/* Vue Tableau (Desktop) */}
+      <div className="card desktop-only" style={{ overflow:"hidden" }}>
         <div style={{ padding:"18px 24px", borderBottom:"1px solid var(--gray-100)" }}>
           <div style={{ fontFamily:"var(--font-title)", fontSize:18, color:"var(--gray-900)" }}>
             📅 Dernières réservations
@@ -61,7 +62,7 @@ export default function AdminDashboard() {
           <thead>
             <tr>
               {["Touriste","Destination","Date","Personnes","Statut"].map(h => (
-                <th key={h} className="th">{h}</th>
+                <th key={h} className="th" style={{ textAlign: 'left', padding: '12px 24px' }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -69,16 +70,44 @@ export default function AdminDashboard() {
             {bookings.length === 0 ? (
               <tr><td colSpan={5} style={{ padding:32, textAlign:"center", color:"var(--gray-400)" }}>Aucune réservation.</td></tr>
             ) : bookings.map((b, i) => (
-              <tr key={b.id || b._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
-                <td className="td" style={{ fontWeight:700 }}>{b.users?.name || "—"}</td>
-                <td className="td" style={{ color:"var(--gray-600)" }}>{b.destinations?.name || "—"}</td>
-                <td className="td" style={{ color:"var(--gray-600)" }}>{new Date(b.check_in || b.date).toLocaleDateString("fr-FR")}</td>
-                <td className="td" style={{ fontWeight:700, textAlign:"center" }}>{b.nb_persons || b.persons}</td>
-                <td className="td"><StatusBadge status={b.status} /></td>
+              <tr key={b.id || b._id} style={{ borderBottom: '1px solid var(--gray-50)' }}>
+                <td style={{ padding: '12px 24px', fontSize: 13, fontWeight:700 }}>{b.users?.name || (b.user_id?.name) || "—"}</td>
+                <td style={{ padding: '12px 24px', fontSize: 13, color:"var(--gray-600)" }}>{b.destinations?.name || (b.destination_id?.name) || "—"}</td>
+                <td style={{ padding: '12px 24px', fontSize: 13, color:"var(--gray-600)" }}>{new Date(b.check_in || b.date).toLocaleDateString("fr-FR")}</td>
+                <td style={{ padding: '12px 24px', fontSize: 13, fontWeight:700, textAlign:"center" }}>{b.nb_persons || b.persons}</td>
+                <td style={{ padding: '12px 24px', fontSize: 13 }}><StatusBadge status={b.status} /></td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Vue Cartes (Mobile) */}
+      <div className="mobile-only" style={{ width: '100%' }}>
+        <div style={{ padding:"0 4px 16px 4px", fontFamily:"var(--font-title)", fontSize:20, color:"var(--gray-900)", textAlign: 'center' }}>
+          📅 Dernières réservations
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {bookings.length === 0 ? (
+            <div className="card" style={{ padding:32, textAlign:"center", color:"var(--gray-400)" }}>Aucune réservation.</div>
+          ) : bookings.map((b) => (
+            <div key={b.id || b._id} className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800, fontSize: 16, color: "var(--gray-900)" }}>{b.users?.name || (b.user_id?.name) || "—"}</div>
+                  <div style={{ fontSize: 12, color: "var(--gray-400)", marginTop: 2 }}>{b.destinations?.name || (b.destination_id?.name) || "—"}</div>
+                </div>
+                <div style={{ flexShrink: 0 }}>
+                  <StatusBadge status={b.status} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: "var(--gray-500)", borderTop: '1px solid var(--gray-50)', paddingTop: 10, marginTop: 4 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>📅 {new Date(b.check_in || b.date).toLocaleDateString("fr-FR")}</span>
+                <span style={{ fontWeight: 700, color: 'var(--blue-700)' }}>{b.nb_persons || b.persons} pers.</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

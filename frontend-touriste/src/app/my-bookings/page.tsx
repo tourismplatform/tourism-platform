@@ -87,25 +87,25 @@ export default function MyBookingsPage() {
   if (loading) return <div style={{ textAlign: 'center', padding: 80 }}>Chargement...</div>;
 
   return (
-    <div style={{ maxWidth: 900, margin: '40px auto', padding: '0 24px' }}>
+    <div style={{ maxWidth: 900, margin: 'clamp(20px, 5vw, 40px) auto', padding: '0 clamp(16px, 4vw, 24px)' }}>
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', top: 20, right: 20, background: '#0f2444', color: 'white', padding: '12px 24px', borderRadius: 12, zIndex: 9999, fontWeight: 700 }}>
+        <div style={{ position: 'fixed', top: 20, right: 20, left: 20, background: '#0f2444', color: 'white', padding: '12px 24px', borderRadius: 12, zIndex: 9999, fontWeight: 700, textAlign: 'center' }}>
           {toast}
         </div>
       )}
 
-      <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 8, color: '#0a0f1e' }}>
+      <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', fontWeight: 700, marginBottom: 8, color: '#0a0f1e' }}>
         Mes Réservations
       </h1>
       <p style={{ color: '#6b7280', marginBottom: 32, fontSize: '0.9rem' }}>Bonjour {user?.name} 👋</p>
 
       {bookings.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 60, background: 'white', borderRadius: 14 }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', background: 'white', borderRadius: 14 }}>
           <div style={{ fontSize: '3rem', marginBottom: 16 }}>📋</div>
           <p style={{ color: '#6b7280' }}>Vous n'avez pas encore de réservations.</p>
-          <button onClick={() => router.push('/destinations')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 24px', borderRadius: 10, cursor: 'pointer', marginTop: 16, fontWeight: 600 }}>
+          <button onClick={() => router.push('/destinations')} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 24px', borderRadius: 10, cursor: 'pointer', marginTop: 16, fontWeight: 600, width: '100%', maxWidth: 300 }}>
             Découvrir les destinations
           </button>
         </div>
@@ -115,9 +115,9 @@ export default function MyBookingsPage() {
             const status = STATUS_STYLES[booking.status] || STATUS_STYLES.PENDING;
             const canReview = booking.status === 'CONFIRMED' || booking.status === 'COMPLETED';
             return (
-              <div key={booking.id} style={{ background: 'white', borderRadius: 14, padding: 24, boxShadow: '0 4px 24px rgba(10,15,30,0.08)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
+              <div key={booking.id} style={{ background: 'white', borderRadius: 14, padding: 'clamp(16px, 4vw, 24px)', boxShadow: '0 4px 24px rgba(10,15,30,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+                  <div style={{ flex: '1 1 250px' }}>
                     <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 6, color: '#0a0f1e' }}>
                       {booking.destinations?.name || 'Destination'}
                     </div>
@@ -128,14 +128,14 @@ export default function MyBookingsPage() {
                       👥 {booking.nb_persons} personne(s) · 💰 {booking.total_price.toLocaleString()} FCFA
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-                    <span style={{ background: status.bg, color: status.color, padding: '4px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, width: '100%', maxWidth: 'none', flex: '1 1 auto' }} className="md:w-auto md:max-w-[200px]">
+                    <span style={{ background: status.bg, color: status.color, padding: '4px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 700, textAlign: 'center', width: 'fit-content' }}>
                       {status.label}
                     </span>
                     {canReview && (
                       <button
                         onClick={() => setReviewForm({ bookingId: booking.id, destinationId: booking.destination_id })}
-                        style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '6px 14px', borderRadius: 8, fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                        style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '8px 14px', borderRadius: 8, fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', width: '100%' }}
                       >
                         ⭐ Laisser un avis
                       </button>
@@ -145,7 +145,7 @@ export default function MyBookingsPage() {
 
                 {/* Formulaire avis */}
                 {reviewForm?.bookingId === booking.id && (
-                  <div style={{ marginTop: 16, padding: 16, background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
+                  <div style={{ marginTop: 16, padding: '16px', background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
                     <div style={{ fontWeight: 700, marginBottom: 10, color: '#0a0f1e' }}>📝 Votre avis</div>
                     <StarRating value={rating} onChange={setRating} />
                     <textarea
@@ -154,12 +154,12 @@ export default function MyBookingsPage() {
                       placeholder="Décrivez votre expérience..."
                       style={{ width: '100%', marginTop: 10, padding: '10px 14px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: '0.9rem', minHeight: 80, resize: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
                     />
-                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                      <button onClick={() => { setReviewForm(null); setRating(0); setComment(''); }} style={{ flex: 1, padding: '9px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontWeight: 600 }}>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                      <button onClick={() => { setReviewForm(null); setRating(0); setComment(''); }} style={{ flex: '1 1 120px', padding: '10px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontWeight: 600 }}>
                         Annuler
                       </button>
-                      <button onClick={handleSubmitReview} disabled={submitting} style={{ flex: 2, padding: '9px', borderRadius: 8, border: 'none', background: '#1a4fd6', color: 'white', cursor: 'pointer', fontWeight: 700, opacity: submitting ? 0.6 : 1 }}>
-                        {submitting ? 'Envoi...' : '✅ Envoyer mon avis'}
+                      <button onClick={handleSubmitReview} disabled={submitting} style={{ flex: '2 1 200px', padding: '10px', borderRadius: 8, border: 'none', background: '#1a4fd6', color: 'white', cursor: 'pointer', fontWeight: 700, opacity: submitting ? 0.6 : 1 }}>
+                        {submitting ? 'Envoi...' : '✅ Envoyer'}
                       </button>
                     </div>
                   </div>

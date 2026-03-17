@@ -164,3 +164,44 @@ a { text-decoration: none; color: inherit; }
   font-weight: 600;
   font-size: 14px;
 }
+
+/* RESPONSIVE UTILITIES */
+.mobile-only { display: none !important; }
+.desktop-only { display: block !important; }
+.mobile-hide { display: table-cell !important; }
+.tablet-hide { display: table-cell !important; }
+
+@media (max-width: 768px) {
+  .mobile-hide { display: none !important; }
+}
+
+@media (max-width: 1024px) {
+  .tablet-hide { display: none !important; }
+  .mobile-only { display: block !important; }
+  .desktop-only { display: none !important; }
+
+  .mobile-topbar { display: flex !important; }
+  
+  .admin-sidebar {
+    position: fixed !important;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    z-index: 200 !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+  }
+  
+  .admin-sidebar.sidebar-active {
+    transform: translateX(0);
+  }
+
+  .admin-main {
+    padding-top: 80px !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-topbar { display: none !important; }
+  .admin-sidebar { transform: none !important; }
+}

@@ -103,16 +103,16 @@ export default function ProfilePage() {
   const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', padding: '0 24px' }}>
-      <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 32, color: '#0a0f1e' }}>
+    <div style={{ maxWidth: 700, margin: 'clamp(20px, 5vw, 40px) auto', padding: '0 clamp(16px, 4vw, 24px)' }}>
+      <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', fontWeight: 700, marginBottom: 32, color: '#0a0f1e' }}>
         Mon Profil
       </h1>
 
       {/* Carte profil */}
-      <div style={{ background: 'white', borderRadius: 16, padding: 32, boxShadow: '0 4px 24px rgba(10,15,30,0.08)', marginBottom: 20 }}>
+      <div style={{ background: 'white', borderRadius: 16, padding: 'clamp(20px, 5vw, 32px)', boxShadow: '0 4px 24px rgba(10,15,30,0.08)', marginBottom: 20 }}>
 
         {/* Avatar + infos */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28, flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', width: 76, height: 76, flexShrink: 0 }}>
             {avatarPreview ? (
               <img 
@@ -137,7 +137,7 @@ export default function ProfilePage() {
               style={{ display: 'none' }}
             />
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: '1 1 200px' }}>
             <div style={{ fontWeight: 700, fontSize: '1.2rem', color: '#0a0f1e' }}>{user?.name}</div>
             <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 6 }}>{user?.email}</div>
             {user?.phone && (
@@ -148,8 +148,8 @@ export default function ProfilePage() {
             </span>
           </div>
           <button onClick={() => { setEditing(!editing); setMessage(null); }}
-            style={{ background: editing ? '#f4f6fa' : '#1a4fd6', color: editing ? '#6b7280' : 'white', border: 'none', borderRadius: 10, padding: '9px 18px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
-            {editing ? 'Annuler' : '✏️ Modifier'}
+            style={{ background: editing ? '#f4f6fa' : '#1a4fd6', color: editing ? '#6b7280' : 'white', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', maxWidth: 'none', flex: '1 1 auto' }} className="md:w-auto">
+            {editing ? 'Annuler' : '✏️ Modifier mon profil'}
           </button>
         </div>
 
@@ -162,32 +162,32 @@ export default function ProfilePage() {
 
         {/* Formulaire modification */}
         {editing ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 6 }}>Nom complet</label>
               <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
+                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 6 }}>Téléphone</label>
               <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+226 00 00 00 00"
-                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
+                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
-            <div style={{ borderTop: '1px solid #f4f6fa', paddingTop: 14 }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 12 }}>Changer le mot de passe (optionnel)</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ borderTop: '1px solid #f4f6fa', paddingTop: 16 }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 16 }}>Sécurité (optionnel)</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <input type="password" placeholder="Mot de passe actuel" value={form.currentPassword} onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
+                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
                 <input type="password" placeholder="Nouveau mot de passe" value={form.newPassword} onChange={e => setForm(f => ({ ...f, newPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
-                <input type="password" placeholder="Confirmer le mot de passe" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-outfit), sans-serif' }} />
+                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                <input type="password" placeholder="Confirmez le nouveau mot de passe" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
               </div>
             </div>
             <button onClick={handleSave} disabled={saving}
-              style={{ background: saving ? '#93c5fd' : '#1a4fd6', color: 'white', border: 'none', borderRadius: 10, padding: '12px', fontWeight: 600, fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
-              {saving ? 'Enregistrement...' : '💾 Sauvegarder'}
+              style={{ background: saving ? '#93c5fd' : '#1a4fd6', color: 'white', border: 'none', borderRadius: 10, padding: '14px', fontWeight: 600, fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', marginTop: 8 }}>
+              {saving ? 'Enregistrement...' : '💾 Sauvegarder les modifications'}
             </button>
           </div>
         ) : (
@@ -198,7 +198,7 @@ export default function ProfilePage() {
               { label: 'Téléphone', value: user?.phone || 'Non renseigné' },
               { label: 'Rôle', value: user?.role },
             ].map(item => (
-              <div key={item.label} style={{ borderBottom: '1px solid #f4f6fa', padding: '12px 0', display: 'flex', justifyContent: 'space-between' }}>
+              <div key={item.label} style={{ borderBottom: '1px solid #f4f6fa', padding: '14px 0', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                 <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280' }}>{item.label}</span>
                 <span style={{ fontSize: '0.9rem', color: '#0a0f1e', fontWeight: 500 }}>{item.value}</span>
               </div>
@@ -208,14 +208,19 @@ export default function ProfilePage() {
       </div>
 
       {/* Statistiques */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
+        gap: 12, 
+        marginBottom: 24 
+      }}>
         {[
           { icon: '📅', label: 'Réservations', value: stats.total },
           { icon: '✅', label: 'Confirmées', value: stats.confirmed },
           { icon: '🏁', label: 'Terminées', value: stats.completed },
           { icon: '💰', label: 'Total dépensé', value: stats.spent.toLocaleString() + ' F' },
         ].map(s => (
-          <div key={s.label} style={{ background: 'white', borderRadius: 12, padding: '16px 12px', boxShadow: '0 4px 24px rgba(10,15,30,0.06)', textAlign: 'center' }}>
+          <div key={s.label} style={{ background: 'white', borderRadius: 12, padding: '20px 12px', boxShadow: '0 4px 24px rgba(10,15,30,0.06)', textAlign: 'center' }}>
             <div style={{ fontSize: '1.4rem', marginBottom: 6 }}>{s.icon}</div>
             <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#0a0f1e', marginBottom: 2 }}>{s.value}</div>
             <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{s.label}</div>
@@ -225,7 +230,7 @@ export default function ProfilePage() {
 
       {/* Déconnexion */}
       <button onClick={() => { logout(); router.push('/'); }}
-        style={{ width: '100%', background: 'transparent', border: '1.5px solid #ef4444', color: '#ef4444', borderRadius: 10, padding: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif', fontSize: '0.92rem' }}>
+        style={{ width: '100%', background: 'white', border: '1.5px solid #ef4444', color: '#ef4444', borderRadius: 10, padding: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.92rem' }}>
         🚪 Se déconnecter
       </button>
     </div>

@@ -36,36 +36,45 @@ useEffect(() => {
       {/* ===== HERO ===== */}
       <section style={{
         background: 'linear-gradient(135deg, #0a0f1e 0%, #0f2e8a 50%, #1a4fd6 100%)',
-        padding: '80px 40px', color: 'white', position: 'relative', overflow: 'hidden'
+        padding: 'clamp(40px, 8vw, 80px) clamp(20px, 5vw, 40px)', color: 'white', position: 'relative', overflow: 'hidden'
       }}>
         {/* Pattern de fond */}
         <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-        <div style={{ position: 'relative', maxWidth: 680 }}>
+        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto' }}>
           {/* Tag */}
           <div style={{ display: 'inline-block', background: 'rgba(255,87,34,0.2)', color: '#ff8a65', border: '1px solid rgba(255,87,34,0.3)', padding: '6px 16px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 600, marginBottom: 20, letterSpacing: '0.5px' }}>
             🌍 Plateforme Officielle de Tourisme
           </div>
 
-          <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '3.8rem', fontWeight: 700, lineHeight: 1.15, marginBottom: 18 }}>
+          <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(2.2rem, 8vw, 3.8rem)', fontWeight: 700, lineHeight: 1.15, marginBottom: 18 }}>
             Découvrez les merveilles du <em style={{ color: '#ff8a65', fontStyle: 'normal' }}>Burkina Faso</em>
           </h1>
 
-          <p style={{ fontSize: '1.05rem', opacity: 0.8, lineHeight: 1.7, marginBottom: 32, maxWidth: 500 }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 3vw, 1.05rem)', opacity: 0.8, lineHeight: 1.7, marginBottom: 32, maxWidth: 550 }}>
             Des destinations exceptionnelles, une culture unique et des expériences inoubliables vous attendent.
           </p>
 
           {/* Barre de recherche */}
-          <div suppressHydrationWarning style={{ background: 'white', borderRadius: 14, padding: '8px 8px 8px 20px', display: 'flex', alignItems: 'center', gap: 10, maxWidth: 560, boxShadow: '0 8px 40px rgba(0,0,0,0.3)' }}>
+          <div suppressHydrationWarning style={{ 
+            background: 'white', borderRadius: 14, padding: '8px', display: 'flex', 
+            flexWrap: 'wrap', alignItems: 'center', gap: 10, maxWidth: 600, 
+            boxShadow: '0 8px 40px rgba(0,0,0,0.3)' 
+          }}>
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder="Rechercher une destination, une région..."
-              style={{ flex: 1, border: 'none', outline: 'none', fontSize: '0.95rem', color: '#0a0f1e', fontFamily: 'var(--font-outfit), sans-serif', background: 'transparent' }}
+              placeholder="Rechercher une destination..."
+              style={{ flex: 1, minWidth: 200, border: 'none', outline: 'none', fontSize: '0.95rem', color: '#0a0f1e', fontFamily: 'var(--font-outfit), sans-serif', background: 'transparent', paddingLeft: 12 }}
             />
-            <button onClick={handleSearch} style={{ background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 24px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif' }}>
+            <button onClick={handleSearch} style={{ 
+              background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 24px', 
+              borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.92rem', 
+              fontFamily: 'var(--font-outfit), sans-serif', width: '100%', maxWidth: 'none',
+              flex: '1 1 auto'
+            }} className="md:w-auto">
               Rechercher
             </button>
           </div>
@@ -86,10 +95,10 @@ useEffect(() => {
           </div>
 
           {/* Statistiques */}
-          <div style={{ display: 'flex', gap: 40, marginTop: 40, paddingTop: 30, borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+          <div style={{ display: 'flex', gap: 'clamp(20px, 5vw, 40px)', marginTop: 40, paddingTop: 30, borderTop: '1px solid rgba(255,255,255,0.15)', flexWrap: 'wrap' }}>
             {[{ num: '50+', label: 'Destinations' }, { num: '2 000+', label: 'Voyageurs' }, { num: '4.8★', label: 'Note moyenne' }].map(s => (
               <div key={s.label}>
-                <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, color: 'white' }}>{s.num}</div>
+                <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 700, color: 'white' }}>{s.num}</div>
                 <div style={{ fontSize: '0.8rem', opacity: 0.6, color: 'white' }}>{s.label}</div>
               </div>
             ))}
@@ -98,9 +107,9 @@ useEffect(() => {
       </section>
 
       {/* ===== DESTINATIONS POPULAIRES ===== */}
-      <section style={{ padding: 40 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.8rem', fontWeight: 700, color: '#0a0f1e' }}>
+      <section style={{ padding: 'clamp(24px, 5vw, 40px)', maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+          <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 4vw, 1.8rem)', fontWeight: 700, color: '#0a0f1e' }}>
             Destinations Populaires
           </h2>
           <button onClick={() => router.push('/destinations')} style={{ color: '#1a4fd6', fontSize: '0.88rem', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-outfit), sans-serif' }}>
@@ -108,7 +117,11 @@ useEffect(() => {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', 
+          gap: 24 
+        }}>
           {filtered.map(dest => (
             <DestinationCard
               key={dest.id}
@@ -118,11 +131,12 @@ useEffect(() => {
           ))}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 32 }}>
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
           <button onClick={() => router.push('/destinations')} style={{
             background: '#1a4fd6', color: 'white', border: 'none', padding: '15px 34px',
             borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: 'pointer',
-            fontFamily: 'var(--font-outfit), sans-serif', transition: 'all 0.2s'
+            fontFamily: 'var(--font-outfit), sans-serif', transition: 'all 0.2s',
+            width: '100%', maxWidth: 300
           }}>
             Voir toutes les destinations
           </button>

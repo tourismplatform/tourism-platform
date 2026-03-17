@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
-import api from "@/lib/api";
+import { adminAPI, authAPI } from "@/lib/api";
 
 export default function AdminProfilePage() {
   const router = useRouter();
@@ -108,35 +108,35 @@ export default function AdminProfilePage() {
   const initials = user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AD';
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto' }}>
+    <div style={{ maxWidth: 900, margin: '0 auto', paddingTop: 'clamp(0px, 15vw, 20px)' }}>
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--gray-900)', marginBottom: 8 }}>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 28px)', fontWeight: 700, color: 'var(--gray-900)', marginBottom: 8 }}>
           Mon Profil Administrateur
         </h1>
-        <p style={{ color: 'var(--gray-600)', fontSize: 14 }}>
+        <p style={{ color: 'var(--gray-600)', fontSize: 13 }}>
           Gérez vos informations personnelles et vos préférences
         </p>
       </div>
 
       {/* Carte profil */}
-      <div style={{ background: 'white', borderRadius: 12, padding: 32, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: 24 }}>
+      <div style={{ background: 'white', borderRadius: 16, padding: 'clamp(20px, 5vw, 32px)', boxShadow: 'var(--shadow-sm)', marginBottom: 24, border: '1px solid var(--gray-100)' }}>
 
         {/* Avatar + infos */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28 }}>
-          <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32, flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', width: 90, height: 90, flexShrink: 0, margin: '0 auto' }} className="md:m-0">
             {avatarPreview ? (
               <img 
                 src={avatarPreview} 
                 alt="Avatar" 
-                style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--blue-100)' }}
+                style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '4px solid var(--blue-50)' }}
               />
             ) : (
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, var(--blue-600), var(--blue-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 24, border: '3px solid var(--blue-100)' }}>
+              <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'linear-gradient(135deg, var(--blue-600), var(--blue-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 28, border: '4px solid var(--blue-50)' }}>
                 {initials}
               </div>
             )}
-            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: -2, right: -2, background: 'var(--blue-600)', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid white' }}>
-              <span style={{ color: 'white', fontSize: 14 }}>📷</span>
+            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--blue-600)', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid white', boxShadow: 'var(--shadow-md)' }}>
+              <span style={{ color: 'white', fontSize: 16 }}>📷</span>
             </label>
             <input
               id="avatar-upload"
@@ -147,19 +147,21 @@ export default function AdminProfilePage() {
               style={{ display: 'none' }}
             />
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: 18, color: 'var(--gray-900)', marginBottom: 4 }}>{user?.name}</div>
-            <div style={{ color: 'var(--gray-600)', fontSize: 14, marginBottom: 4 }}>{user?.email}</div>
+          <div style={{ flex: '1 1 300px', textAlign: 'center' }} className="md:text-left">
+            <div style={{ fontWeight: 800, fontSize: 20, color: 'var(--gray-900)', marginBottom: 6 }}>{user?.name}</div>
+            <div style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 4, fontWeight: 500 }}>{user?.email}</div>
             {user?.phone && (
-              <div style={{ color: 'var(--gray-600)', fontSize: 14, marginBottom: 4 }}>📞 {user.phone}</div>
+              <div style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 8, fontWeight: 500 }}>📞 {user.phone}</div>
             )}
-            <span style={{ background: 'var(--blue-100)', color: 'var(--blue-800)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
-              👑 Administrateur
-            </span>
+            <div style={{ marginTop: 12 }}>
+              <span style={{ background: 'var(--blue-50)', color: 'var(--blue-700)', padding: '6px 14px', borderRadius: 20, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                👑 Administrateur
+              </span>
+            </div>
           </div>
           <button onClick={() => { setEditing(!editing); setMessage({type: '', text: ''}); }}
-            style={{ background: editing ? 'var(--gray-100)' : 'var(--blue-600)', color: editing ? 'var(--gray-700)' : 'white', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
-            {editing ? 'Annuler' : '✏️ Modifier'}
+            style={{ background: editing ? 'var(--gray-100)' : 'var(--blue-600)', color: editing ? 'var(--gray-700)' : 'white', border: 'none', borderRadius: 10, padding: '12px 24px', fontWeight: 700, fontSize: 14, cursor: 'pointer', flex: '1 1 100%', transition: 'all 0.2s' }} className="md:w-auto md:flex-initial">
+            {editing ? 'Annuler l\'édition' : '✏️ Modifier le profil'}
           </button>
         </div>
 
@@ -169,67 +171,68 @@ export default function AdminProfilePage() {
             background: message.type === 'success' ? '#d1fae5' : '#fef2f2', 
             color: message.type === 'success' ? '#065f46' : '#ef4444', 
             border: `1px solid ${message.type === 'success' ? '#6ee7b7' : '#fecaca'}`, 
-            borderRadius: 8, 
-            padding: '12px 16px', 
-            marginBottom: 20, 
-            fontSize: 14 
+            borderRadius: 12, 
+            padding: '14px 20px', 
+            marginBottom: 24, 
+            fontSize: 14,
+            fontWeight: 500
           }}>
-            {message.text}
+            {message.type === 'success' ? '✅ ' : '❌ '}{message.text}
           </div>
         )}
 
         {/* Formulaire modification */}
         {editing ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--gray-600)', marginBottom: 6 }}>Nom complet</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-500)', marginBottom: 8 }}>Nom complet</label>
               <input 
                 value={form.name} 
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                style={{ width: '100%', border: '1.5px solid var(--gray-300)', borderRadius: 8, padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} 
+                style={{ width: '100%', border: '1.5px solid var(--gray-200)', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--gray-50)', color: 'var(--gray-900)' }} 
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--gray-600)', marginBottom: 6 }}>Téléphone</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-500)', marginBottom: 8 }}>Téléphone</label>
               <input 
                 value={form.phone} 
                 onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+226 00 00 00 00"
-                style={{ width: '100%', border: '1.5px solid var(--gray-300)', borderRadius: 8, padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} 
+                style={{ width: '100%', border: '1.5px solid var(--gray-200)', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--gray-50)', color: 'var(--gray-900)' }} 
               />
             </div>
-            <div style={{ borderTop: '1px solid var(--gray-200)', paddingTop: 16 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--gray-600)', marginBottom: 12 }}>Changer le mot de passe (optionnel)</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 24, marginTop: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-500)', marginBottom: 16 }}>Changer le mot de passe (optionnel)</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <input 
                   type="password" 
                   placeholder="Mot de passe actuel" 
                   value={form.currentPassword} 
                   onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid var(--gray-300)', borderRadius: 8, padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} 
+                  style={{ width: '100%', border: '1.5px solid var(--gray-200)', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--gray-50)' }} 
                 />
                 <input 
                   type="password" 
                   placeholder="Nouveau mot de passe" 
                   value={form.newPassword} 
                   onChange={e => setForm(f => ({ ...f, newPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid var(--gray-300)', borderRadius: 8, padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} 
+                  style={{ width: '100%', border: '1.5px solid var(--gray-200)', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--gray-50)' }} 
                 />
                 <input 
                   type="password" 
-                  placeholder="Confirmer le mot de passe" 
+                  placeholder="Confirmer le nouveau mot de passe" 
                   value={form.confirmPassword} 
                   onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid var(--gray-300)', borderRadius: 8, padding: '10px 14px', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} 
+                  style={{ width: '100%', border: '1.5px solid var(--gray-200)', borderRadius: 10, padding: '12px 16px', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'var(--gray-50)' }} 
                 />
               </div>
             </div>
             <button 
               onClick={handleSave} 
               disabled={saving}
-              style={{ background: saving ? 'var(--blue-400)' : 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 8, padding: '12px', fontWeight: 600, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer' }}
+              style={{ background: saving ? 'var(--blue-400)' : 'var(--blue-600)', color: 'white', border: 'none', borderRadius: 10, padding: '14px', fontWeight: 700, fontSize: 15, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: 'var(--shadow-md)', marginTop: 8 }}
             >
-              {saving ? 'Enregistrement...' : '💾 Sauvegarder'}
+              {saving ? 'Enregistrement...' : '💾 Enregistrer les modifications'}
             </button>
           </div>
         ) : (
@@ -239,10 +242,10 @@ export default function AdminProfilePage() {
               { label: 'Email', value: user?.email },
               { label: 'Téléphone', value: user?.phone || 'Non renseigné' },
               { label: 'Rôle', value: 'Administrateur' },
-            ].map(item => (
-              <div key={item.label} style={{ borderBottom: '1px solid var(--gray-200)', padding: '12px 0', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--gray-600)' }}>{item.label}</span>
-                <span style={{ fontSize: 14, color: 'var(--gray-900)', fontWeight: 500 }}>{item.value}</span>
+            ].map((item, idx) => (
+              <div key={item.label} style={{ borderBottom: idx === 3 ? 'none' : '1px solid var(--gray-100)', padding: '16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-400)' }}>{item.label}</span>
+                <span style={{ fontSize: 14, color: 'var(--gray-900)', fontWeight: 600 }}>{item.value}</span>
               </div>
             ))}
           </div>
@@ -250,29 +253,29 @@ export default function AdminProfilePage() {
       </div>
 
       {/* Statistiques administrateur */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginBottom: 24 }}>
         {[
-          { icon: '🗺️', label: 'Destinations', value: stats.totalDestinations || 0 },
-          { icon: '📅', label: 'Réservations', value: stats.totalBookings || 0 },
-          { icon: '👥', label: 'Utilisateurs', value: stats.totalUsers || 0 },
-          { icon: '💰', label: 'Revenus', value: (stats.totalRevenue || 0).toLocaleString() + ' F' },
+          { icon: '🗺️', label: 'Destinations', value: stats.totalDestinations || 0, color: '#3b82f6' },
+          { icon: '📅', label: 'Réservations', value: stats.totalBookings || 0, color: '#10b981' },
+          { icon: '👥', label: 'Utilisateurs', value: stats.totalUsers || 0, color: '#f59e0b' },
+          { icon: '💰', label: 'Revenus', value: (stats.totalRevenue || 0).toLocaleString() + ' F', color: '#8b5cf6' },
         ].map(s => (
-          <div key={s.label} style={{ background: 'white', borderRadius: 12, padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>{s.icon}</div>
-            <div style={{ fontWeight: 700, fontSize: 20, color: 'var(--gray-900)', marginBottom: 4 }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: 'var(--gray-600)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
+          <div key={s.label} style={{ background: 'white', borderRadius: 16, padding: '24px 20px', boxShadow: 'var(--shadow-sm)', textAlign: 'center', border: '1px solid var(--gray-100)' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>{s.icon}</div>
+            <div style={{ fontWeight: 800, fontSize: 24, color: 'var(--gray-900)', marginBottom: 4 }}>{s.value}</div>
+            <div style={{ fontSize: 11, color: 'var(--gray-400)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Déconnexion */}
-      <div style={{ background: 'white', borderRadius: 12, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--gray-900)', marginBottom: 12 }}>Session</h3>
+      <div style={{ background: 'white', borderRadius: 16, padding: 24, boxShadow: 'var(--shadow-sm)', border: '1px solid var(--gray-100)' }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--gray-900)', marginBottom: 16 }}>Compte & Session</h3>
         <button 
           onClick={handleLogout}
-          style={{ width: '100%', background: 'transparent', border: '1.5px solid #ef4444', color: '#ef4444', borderRadius: 8, padding: '12px', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}
+          style={{ width: '100%', background: 'var(--red-l)', border: '1.5px solid var(--red-l)', color: 'var(--red)', borderRadius: 10, padding: '14px', fontWeight: 700, cursor: 'pointer', fontSize: 14, transition: 'all 0.2s' }}
         >
-          🚪 Se déconnecter
+          🚪 Se déconnecter de l'administration
         </button>
       </div>
     </div>

@@ -131,34 +131,35 @@ export default function AdminDestinations() {
       )}
 
       {/* Header */}
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:28 }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:28, gap: 16, flexWrap: 'wrap', paddingTop: 'clamp(0px, 15vw, 40px)' }}>
         <div>
-          <h2 style={{ fontFamily:"var(--font-title)", fontSize:28, color:"var(--gray-900)", margin:0 }}>
+          <h2 style={{ fontFamily:"var(--font-title)", fontSize:'clamp(1.5rem, 5vw, 28px)', color:"var(--gray-900)", margin:0 }}>
             Gestion des Destinations
           </h2>
           <p style={{ color:"var(--gray-400)", fontSize:13, marginTop:4 }}>{dests.length} destination(s)</p>
         </div>
-        <button onClick={() => { setForm(empty); setEditing(null); setShowForm(true); }} className="btn-primary">
+        <button onClick={() => { setForm(empty); setEditing(null); setShowForm(true); }} className="btn-primary" style={{ flex: '1 1 auto', maxWidth: 'none', justifyContent: 'center' }}>
           + Ajouter une destination
         </button>
       </div>
 
-      {/* Tableau */}
-      <div className="card" style={{ overflow:"hidden" }}>
+      {/* Vue Tableau (Desktop) */}
+      <div className="card desktop-only" style={{ overflow:"hidden", marginTop: 20 }}>
         <table style={{ width:"100%", borderCollapse:"collapse" }}>
           <thead>
             <tr>
-              {["Destination","Catégorie","Prix","Actions"].map(h => (
-                <th key={h} className="th">{h}</th>
-              ))}
+              <th className="th" style={{ textAlign: 'left', padding: '12px 24px' }}>Destination</th>
+              <th className="th" style={{ textAlign: 'left', padding: '12px 24px' }}>Catégorie</th>
+              <th className="th" style={{ textAlign: 'left', padding: '12px 24px' }}>Prix</th>
+              <th className="th" style={{ textAlign: 'left', padding: '12px 24px' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {dests.length === 0 ? (
               <tr><td colSpan={4} style={{ padding:40, textAlign:"center", color:"var(--gray-400)" }}>Aucune destination.</td></tr>
             ) : dests.map((d, i) => (
-              <tr key={d.id || d._id} style={{ background: i%2===0 ? "var(--white)" : "var(--gray-50)" }}>
-                <td className="td">
+              <tr key={d.id || d._id} style={{ borderBottom: '1px solid var(--gray-50)' }}>
+                <td style={{ padding: '12px 24px' }}>
                   <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                     <img
                       src={getImg(d.name, d.images)}
@@ -167,25 +168,25 @@ export default function AdminDestinations() {
                       onError={e => { e.currentTarget.src = "https://images.unsplash.com/photo-1580746738099-1b1d621a3404?w=200&q=60"; }}
                     />
                     <div>
-                      <div style={{ fontWeight:700, fontSize:14, color:"var(--gray-900)" }}>{d.name}</div>
-                      <div style={{ fontSize:12, color:"var(--gray-400)" }}>📍 {d.location}</div>
+                      <div style={{ fontWeight:700, fontSize:13, color:"var(--gray-900)" }}>{d.name}</div>
+                      <div style={{ fontSize:11, color:"var(--gray-400)" }}>📍 {d.location}</div>
                     </div>
                   </div>
                 </td>
-                <td className="td">
-                  <span style={{ background:"var(--blue-50)", color:"var(--blue-700)", border:"1px solid var(--blue-100)", borderRadius:20, padding:"3px 12px", fontSize:12, fontWeight:600 }}>
+                <td style={{ padding: '12px 24px' }}>
+                  <span style={{ background:"var(--blue-50)", color:"var(--blue-700)", border:"1px solid var(--blue-100)", borderRadius:20, padding:"3px 12px", fontSize:11, fontWeight:600 }}>
                     {d.category}
                   </span>
                 </td>
-                <td className="td" style={{ fontWeight:700, color:"var(--blue-700)" }}>
-                  {d.price_per_person > 0 ? Number(d.price_per_person).toLocaleString("fr-FR") + " FCFA" : "Gratuit"}
+                <td style={{ padding: '12px 24px', fontWeight:700, color:"var(--blue-700)", fontSize: 13 }}>
+                  {d.price_per_person > 0 ? Number(d.price_per_person).toLocaleString("fr-FR") + " F" : "Gratuit"}
                 </td>
-                <td className="td">
+                <td style={{ padding: '12px 24px' }}>
                   <div style={{ display:"flex", gap:8 }}>
-                    <button onClick={() => openEdit(d)} style={{ background:"var(--blue-50)", color:"var(--blue-700)", border:"none", borderRadius:8, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+                    <button onClick={() => openEdit(d)} style={{ background:"var(--blue-50)", color:"var(--blue-700)", border:"none", borderRadius:8, padding:"8px 14px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
                       ✏️ Modifier
                     </button>
-                    <button onClick={() => setDelModal({ open:true, id:d.id || d._id })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"6px 14px", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"var(--font-body)" }}>
+                    <button onClick={() => setDelModal({ open:true, id:d.id || d._id })} style={{ background:"var(--red-l)", color:"var(--red)", border:"none", borderRadius:8, padding:"8px 14px", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
                       🗑 Supprimer
                     </button>
                   </div>
@@ -194,6 +195,51 @@ export default function AdminDestinations() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Vue Cartes (Mobile) */}
+      <div className="mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {dests.length === 0 ? (
+          <div className="card" style={{ padding:40, textAlign:"center", color:"var(--gray-400)" }}>Aucune destination.</div>
+        ) : dests.map((d) => (
+          <div key={d.id || d._id} className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <img
+                src={getImg(d.name, d.images)}
+                alt={d.name}
+                style={{ width: 80, height: 70, objectFit: "cover", borderRadius: 10, flexShrink: 0 }}
+                onError={e => { e.currentTarget.src = "https://images.unsplash.com/photo-1580746738099-1b1d621a3404?w=200&q=60"; }}
+              />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "var(--gray-900)", marginBottom: 4 }}>{d.name}</div>
+                <div style={{ fontSize: 12, color: "var(--gray-400)", marginBottom: 8 }}>📍 {d.location}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ background:"var(--blue-50)", color:"var(--blue-700)", border:"1px solid var(--blue-100)", borderRadius:20, padding:"2px 10px", fontSize:10, fontWeight:700 }}>
+                    {d.category}
+                  </span>
+                  <div style={{ fontWeight: 800, color: "var(--blue-700)", fontSize: 14 }}>
+                    {d.price_per_person > 0 ? Number(d.price_per_person).toLocaleString("fr-FR") + " F" : "Gratuit"}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ display: "grid", gridTemplateColumns: '1fr 1fr', gap: 10, borderTop: '1px solid var(--gray-50)', paddingTop: 12 }}>
+              <button 
+                onClick={() => openEdit(d)} 
+                style={{ background: "var(--blue-600)", color: "white", border: "none", borderRadius: 8, padding: "10px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              >
+                ✏️ Modifier
+              </button>
+              <button 
+                onClick={() => setDelModal({ open: true, id: d.id || d._id })} 
+                style={{ background: "var(--red-l)", color: "var(--red)", border: "none", borderRadius: 8, padding: "10px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              >
+                🗑 Supprimer
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Formulaire modal */}
