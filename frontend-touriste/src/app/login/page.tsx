@@ -37,7 +37,7 @@ Cookies.set('token', token);
 Cookies.set('user', JSON.stringify(user));
 login(user, token);
 if (user.role === 'ADMIN') {
-  window.location.href = 'http://localhost:3002/admin';
+ window.location.href = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3002/admin';
 } else {
   router.push(redirectTo || '/');
 }
