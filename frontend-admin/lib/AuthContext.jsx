@@ -10,19 +10,38 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = Cookies.get("token");
-    const saved = Cookies.get("user");
-    if (token && saved) {
-      try { 
-        // Les cookies sont encodés en URL, on décode pour le JSON
-        setUser(JSON.parse(decodeURIComponent(saved))); 
+  // Récupère token depuis URL si venant du portail touriste
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get('token');
+    const userFromUrl = params.get('user');
+    
+    if (tokenFromUrl && userFromUrl) {
+      document.cookie = `token=${tokenFromUrl}; path=/`;
+      document.cookie = `user=${encodeURIComponent(userFromUrl)}; path=/`;
+      window.history.replaceState({}, '', '/admin');
+      try {
+        setUser(JSON.parse(decodeURIComponent(userFromUrl)));
       } catch {
-        // Fallback si ce n'est pas du JSON encodé (cas d'un cookie simple)
-        try { setUser(JSON.parse(saved)); } catch {}
+        try { setUser(JSON.parse(userFromUrl)); } catch {}
       }
+      setLoading(false);
+      return;
     }
-    setLoading(false);
-  }, []);
+  }
+
+  // Sinon lit les cookies normalement
+  const token = Cookies.get("token");
+  const saved = Cookies.get("user");
+  if (token && saved) {
+    try { 
+      setUser(JSON.parse(decodeURIComponent(saved))); 
+    } catch {
+      try { setUser(JSON.parse(saved)); } catch {}
+    }
+  }
+  setLoading(false);
+}, []);
 
   const login = (userData, token) => {
     // Note: On laisse le portail touriste gérer l'écriture des cookies au login 
