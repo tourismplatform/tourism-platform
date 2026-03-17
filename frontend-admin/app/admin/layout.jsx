@@ -19,10 +19,19 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== "ADMIN")) {
-      window.location.href = process.env.NEXT_PUBLIC_TOURISTE_URL ? process.env.NEXT_PUBLIC_TOURISTE_URL + '/login' : 'http://localhost:3000/login';
+  // Récupère token depuis URL si venant du portail touriste
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const userParam = params.get('user');
+    if (token && userParam) {
+      document.cookie = `token=${token}; path=/`;
+      document.cookie = `user=${encodeURIComponent(userParam)}; path=/`;
+      // Nettoie l'URL
+      window.history.replaceState({}, '', '/admin');
     }
-  }, [user, loading]);
+  }
+}, []);
 
   if (loading || !user || user.role !== "ADMIN") {
     return (

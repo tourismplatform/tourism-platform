@@ -37,7 +37,8 @@ Cookies.set('token', token);
 Cookies.set('user', JSON.stringify(user));
 login(user, token);
 if (user.role === 'ADMIN') {
- window.location.href = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3002/admin';
+ const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3002';
+window.location.href = `${adminUrl}/admin?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`;
 } else {
   router.push(redirectTo || '/');
 }
