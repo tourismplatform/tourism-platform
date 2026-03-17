@@ -1,7 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Destination } from '@/types';
 import DestinationCard from '@/components/DestinationCard';
@@ -9,7 +9,7 @@ import api from '@/lib/api';
 
 const CATEGORIES = ['NATURE', 'CULTURE', 'AVENTURE', 'PLAGE'];
 
-export default function DestinationsPage() {
+function DestinationsList() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -125,5 +125,13 @@ export default function DestinationsPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function DestinationsPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', padding: 80 }}>Chargement...</div>}>
+      <DestinationsList />
+    </Suspense>
   );
 }
