@@ -1,6 +1,7 @@
 'use client';
 import { Destination } from '@/types';
 import { useState } from 'react';
+import { useCurrencyStore } from '@/lib/currency';
 
 interface Props {
   destination: Destination;
@@ -22,6 +23,7 @@ const COLORS: Record<string, string> = {
 };
 
 export default function DestinationCard({ destination, onClick }: Props) {
+  const { formatPrice } = useCurrencyStore();
   const [fav, setFav] = useState(false);
   const icon = ICONS[destination.category] || '📍';
   const color = COLORS[destination.category] || 'linear-gradient(135deg, #1a4fd6, #00875a)';
@@ -63,7 +65,7 @@ export default function DestinationCard({ destination, onClick }: Props) {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, color: '#1a4fd6', fontSize: '0.95rem' }}>
-           {(destination.price || destination.price_per_person)?.toLocaleString()} FCFA<span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 400 }}>/pers.</span>
+           {formatPrice(destination.price || destination.price_per_person || 0)} <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: 400 }}>/pers.</span>
           </span>
           <span style={{ background: '#fff8e7', color: '#d97706', padding: '3px 8px', borderRadius: 6, fontSize: '0.78rem', fontWeight: 700 }}>
             ⭐  {destination.rating || destination.avg_rating || 0}
