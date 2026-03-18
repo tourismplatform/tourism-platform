@@ -9,7 +9,10 @@ import api from '@/lib/api';
 
 const CATEGORIES = ['NATURE', 'CULTURE', 'AVENTURE', 'PLAGE'];
 
+import { useCurrencyStore } from '@/lib/currency';
+
 function DestinationsList() {
+  const { formatPrice } = useCurrencyStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -96,7 +99,7 @@ function DestinationsList() {
             <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#6b7280', marginBottom: 12 }}>Prix maximum</div>
             <input type="range" min={5000} max={100000} step={1000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} style={{ width: '100%', accentColor: '#1a4fd6' }} />
             <div style={{ background: '#f4f6fa', borderRadius: 8, padding: '10px 14px', fontSize: '0.85rem', color: '#6b7280', marginTop: 8 }}>
-              Max : {maxPrice.toLocaleString()} FCFA
+              Max : {formatPrice(maxPrice)}
             </div>
           </div>
 

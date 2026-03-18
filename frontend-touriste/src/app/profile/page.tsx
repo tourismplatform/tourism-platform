@@ -5,11 +5,14 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
+import { useCurrencyStore } from '@/lib/currency';
 import api from '@/lib/api';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated, logout, login, updateUser } = useAuthStore();
+  const { formatPrice } = useCurrencyStore();
+  const [mounted, setMounted] = useState(false);
   const [bookings, setBookings] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -20,6 +23,7 @@ export default function ProfilePage() {
   const [showZoom, setShowZoom] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!isAuthenticated) { router.push('/login'); return; }
     setForm(f => ({ 
       ...f, 
@@ -99,7 +103,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (!isAuthenticated) return null;
+  if (!mounted || !isAuthenticated) return null;
 
   const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
 
@@ -230,7 +234,7 @@ export default function ProfilePage() {
           { icon: '📅', label: 'Réservations', value: stats.total },
           { icon: '✅', label: 'Confirmées', value: stats.confirmed },
           { icon: '🏁', label: 'Terminées', value: stats.completed },
-          { icon: '💰', label: 'Total dépensé', value: stats.spent.toLocaleString() + ' F' },
+          { icon: '💰', label: 'Total dépensé', value: formatPrice(stats.spent) },
         ].map(s => (
           <div key={s.label} style={{ background: 'white', borderRadius: 12, padding: '20px 12px', boxShadow: '0 4px 24px rgba(10,15,30,0.06)', textAlign: 'center' }}>
             <div style={{ fontSize: '1.4rem', marginBottom: 6 }}>{s.icon}</div>

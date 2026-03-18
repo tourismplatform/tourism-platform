@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Destination, Review } from '@/types';
 import { useAuthStore } from '@/lib/auth';
+import { useCurrencyStore } from '@/lib/currency';
 import api from '@/lib/api';
 
 const ICONS: Record<string, string> = { NATURE: '🌿', CULTURE: '🏛️', AVENTURE: '⛰️', PLAGE: '🏖️' };
@@ -16,6 +17,7 @@ const COLORS: Record<string, string> = {
 export default function DestinationDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { formatPrice } = useCurrencyStore();
   const [destination, setDestination] = useState<Destination | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const { isAuthenticated } = useAuthStore();
@@ -147,7 +149,7 @@ export default function DestinationDetailPage() {
           position: 'sticky', top: 84 
         }} className="lg:static-on-mobile">
           <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.9rem', fontWeight: 700, color: '#1a4fd6', marginBottom: 4 }}>
-            {(destination.price_per_person || 0).toLocaleString()} FCFA{' '}
+            {formatPrice(destination.price_per_person || 0)}{' '}
             <small style={{ fontSize: '0.9rem', color: '#6b7280', fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 400 }}>/personne</small>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 18, fontSize: '0.85rem' }}>
@@ -176,7 +178,7 @@ export default function DestinationDetailPage() {
 
           <div style={{ background: '#eff6ff', borderRadius: 10, padding: '14px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.85rem', color: '#6b7280' }}>Total estimé</span>
-            <span style={{ fontWeight: 700, color: '#1a4fd6', fontSize: '1.1rem' }}>{total.toLocaleString()} FCFA</span>
+            <span style={{ fontWeight: 700, color: '#1a4fd6', fontSize: '1.1rem' }}>{formatPrice(total)}</span>
           </div>
 
           <button

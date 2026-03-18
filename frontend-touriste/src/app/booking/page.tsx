@@ -6,9 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
 import api from '@/lib/api';
 import Cookies from 'js-cookie';
+import { useCurrencyStore } from '@/lib/currency';
 
 function BookingContent() {
   const router = useRouter();
+  const { formatPrice } = useCurrencyStore();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
   const [step, setStep] = useState(1);
@@ -116,7 +118,7 @@ function BookingContent() {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0 0', fontWeight: 700, fontSize: '1.1rem', color: '#1a4fd6' }}>
                 <span>Total</span>
-                <span>{total_price.toLocaleString()} FCFA</span>
+                <span>{formatPrice(total_price)}</span>
               </div>
             </div>
             <button onClick={() => setStep(2)} style={{ width: '100%', background: '#1a4fd6', color: 'white', border: 'none', padding: 16, borderRadius: 10, fontWeight: 600, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -129,7 +131,7 @@ function BookingContent() {
         {step === 2 && (
           <>
             <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.8rem', fontWeight: 700, marginBottom: 8 }}>Paiement</h2>
-            <p style={{ color: '#6b7280', marginBottom: 24, fontSize: '0.9rem' }}>Montant à payer : <strong style={{ color: '#1a4fd6' }}>{total_price.toLocaleString()} FCFA</strong></p>
+            <p style={{ color: '#6b7280', marginBottom: 24, fontSize: '0.9rem' }}>Montant à payer : <strong style={{ color: '#1a4fd6' }}>{formatPrice(total_price)}</strong></p>
 
             {error && (
               <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, color: '#ef4444', fontSize: '0.88rem' }}>

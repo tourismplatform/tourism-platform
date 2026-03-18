@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
 import api from '@/lib/api';
+import { useCurrencyStore } from '@/lib/currency';
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   CONFIRMED: { bg: '#d1fae5', color: '#065f46', label: 'Confirmé' },
@@ -28,6 +29,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
 export default function MyBookingsPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
+  const { formatPrice } = useCurrencyStore();
   const [bookings, setBookings]     = useState<any[]>([]);
   const [loading, setLoading]       = useState(true);
   const [mounted, setMounted]       = useState(false);
@@ -125,7 +127,7 @@ export default function MyBookingsPage() {
                       📅 {new Date(booking.check_in).toLocaleDateString('fr-FR')} → {new Date(booking.check_out).toLocaleDateString('fr-FR')}
                     </div>
                     <div style={{ color: '#6b7280', fontSize: '0.85rem' }}>
-                      👥 {booking.nb_persons} personne(s) · 💰 {booking.total_price.toLocaleString()} FCFA
+                      👥 {booking.nb_persons} personne(s) · 💰 {formatPrice(booking.total_price)}
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, width: '100%', maxWidth: 'none', flex: '1 1 auto' }} className="md:w-auto md:max-w-[200px]">
