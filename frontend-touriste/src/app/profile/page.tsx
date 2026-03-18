@@ -9,7 +9,7 @@ import api from '@/lib/api';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isAuthenticated, logout, login } = useAuthStore();
+  const { user, isAuthenticated, logout, login, updateUser } = useAuthStore();
   const [bookings, setBookings] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showZoom, setShowZoom] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) { router.push('/login'); return; }
@@ -52,7 +53,7 @@ export default function ProfilePage() {
         payload.newPassword = form.newPassword;
       }
       const res = await api.put('/auth/profile', payload);
-      login({ ...user!, name: form.name, phone: form.phone }, '');
+      updateUser({ ...user!, name: form.name, phone: form.phone });
       setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
       setEditing(false);
     } catch (err: any) {
@@ -89,7 +90,7 @@ export default function ProfilePage() {
 
       const newAvatarUrl = res.data.data.avatar;
       setAvatarPreview(newAvatarUrl);
-      login({ ...user!, avatar: newAvatarUrl }, '');
+      updateUser({ ...user!, avatar: newAvatarUrl });
       setMessage({ type: 'success', text: 'Avatar mis à jour avec succès !' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.response?.data?.message || 'Erreur lors de l\'upload' });
@@ -104,6 +105,14 @@ export default function ProfilePage() {
 
   return (
     <div style={{ maxWidth: 700, margin: 'clamp(20px, 5vw, 40px) auto', padding: '0 clamp(16px, 4vw, 24px)' }}>
+      {/* Petite infusion de CSS pour l'animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
       <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', fontWeight: 700, marginBottom: 32, color: '#0a0f1e' }}>
         Mon Profil
       </h1>
@@ -118,7 +127,10 @@ export default function ProfilePage() {
               <img 
                 src={avatarPreview} 
                 alt="Avatar" 
-                style={{ width: 76, height: 76, borderRadius: '50%', objectFit: 'cover' }}
+                onClick={() => setShowZoom(true)}
+                style={{ width: 76, height: 76, borderRadius: '50%', objectFit: 'cover', cursor: 'zoom-in', transition: 'transform 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               />
             ) : (
               <div style={{ width: 76, height: 76, background: 'linear-gradient(135deg, #1a4fd6, #ff5722)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '1.8rem' }}>
@@ -233,6 +245,23 @@ export default function ProfilePage() {
         style={{ width: '100%', background: 'white', border: '1.5px solid #ef4444', color: '#ef4444', borderRadius: 10, padding: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.92rem' }}>
         🚪 Se déconnecter
       </button>
+
+      {/* Modal Zoom Image */}
+      {showZoom && avatarPreview && (
+        <div 
+          onClick={() => setShowZoom(false)}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', backdropFilter: 'blur(4px)', animation: 'fadeIn 0.2s ease-out' }}
+        >
+          <img 
+            src={avatarPreview} 
+            alt="Zoom Avatar" 
+            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: 20, boxShadow: '0 0 40px rgba(0,0,0,0.5)', border: '4px solid white' }} 
+          />
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

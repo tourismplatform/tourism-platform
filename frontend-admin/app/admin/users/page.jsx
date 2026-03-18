@@ -8,6 +8,7 @@ export default function AdminUsers() {
   const [users, setUsers]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch]   = useState("");
+  const [zoomImage, setZoomImage] = useState(null);
 
   useEffect(() => {
     adminAPI.getUsers()
@@ -76,8 +77,20 @@ export default function AdminUsers() {
               <tr key={u.id || u._id} style={{ borderBottom: '1px solid var(--gray-50)' }}>
                 <td style={{ padding: '12px 24px' }}>
                   <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                    <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,var(--blue-600),var(--blue-800))", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:12, flexShrink:0 }}>
-                      {(u.name || "?").charAt(0).toUpperCase()}
+                    <div 
+                      onClick={() => u.avatar && setZoomImage(u.avatar)}
+                      style={{ 
+                        width:36, height:36, borderRadius:"12px", background:"linear-gradient(135deg,var(--blue-600),var(--blue-800))", 
+                        display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", 
+                        fontSize:14, flexShrink:0, overflow: 'hidden', cursor: u.avatar ? 'zoom-in' : 'default',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.1)', border: '1.5px solid white'
+                      }}
+                    >
+                      {u.avatar ? (
+                        <img src={u.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        (u.name || "?").charAt(0).toUpperCase()
+                      )}
                     </div>
                     <span style={{ fontWeight:700, fontSize:13, color:"var(--gray-900)" }}>
                       {u.name || "Utilisateur"}
@@ -106,8 +119,20 @@ export default function AdminUsers() {
         ) : filtered.map((u) => (
           <div key={u.id || u._id} className="card" style={{ padding: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-              <div style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,var(--blue-600),var(--blue-800))", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14, flexShrink:0 }}>
-                {(u.name || "?").charAt(0).toUpperCase()}
+              <div 
+                onClick={() => u.avatar && setZoomImage(u.avatar)}
+                style={{ 
+                  width:44, height:44, borderRadius:"14px", background:"linear-gradient(135deg,var(--blue-600),var(--blue-800))", 
+                  display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", 
+                  fontSize:16, flexShrink:0, overflow: 'hidden', cursor: u.avatar ? 'zoom-in' : 'default',
+                  border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                {u.avatar ? (
+                  <img src={u.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  (u.name || "?").charAt(0).toUpperCase()
+                )}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 800, fontSize: 14, color: "var(--gray-900)" }}>{u.name || "Utilisateur"}</div>
@@ -126,6 +151,36 @@ export default function AdminUsers() {
           </div>
         ))}
       </div>
+
+      {/* Modal Zoom Image */}
+      {zoomImage && (
+        <div 
+          onClick={() => setZoomImage(null)}
+          style={{ 
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
+            background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', 
+            alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', 
+            backdropFilter: 'blur(4px)', animation: 'fadeIn 0.2s ease-out' 
+          }}
+        >
+          <img 
+            src={zoomImage} 
+            alt="Zoom User" 
+            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: 20, boxShadow: '0 0 40px rgba(0,0,0,0.5)', border: '4px solid white' }} 
+          />
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Animation fadeIn */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }

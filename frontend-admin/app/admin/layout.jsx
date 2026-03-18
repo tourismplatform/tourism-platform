@@ -10,7 +10,6 @@ const NAV = [
   { href:"/admin/bookings",     icon:"📅", label:"Réservations" },
   { href:"/admin/reviews",      icon:"⭐", label:"Avis" },
   { href:"/admin/users",        icon:"👥", label:"Utilisateurs" },
-  { href:"/admin/profile",      icon:"👤", label:"Mon Profil" },
 ];
 
 export default function AdminLayout({ children }) {
@@ -149,13 +148,21 @@ export default function AdminLayout({ children }) {
             onClick={() => setSidebarOpen(false)}
             style={{ textDecoration: 'none' }}
           >
-            <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer", padding:"8px", borderRadius:"8px" }}>
-              <div style={{ width:34, height:34, borderRadius:"50%", background:"var(--blue-600)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:14 }}>
-                {user?.name?.charAt(0).toUpperCase() || "A"}
+            <div style={{ 
+              display:"flex", alignItems:"center", gap:10, cursor:"pointer", padding:"10px", borderRadius:"12px",
+              background: pathname === "/admin/profile" ? "var(--blue-600)" : "transparent",
+              transition: 'background 0.2s'
+            }}>
+              <div style={{ width:38, height:38, borderRadius:"50%", background:"var(--blue-600)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, color:"var(--white)", fontSize:15, overflow: 'hidden', border: '2px solid rgba(255,255,255,0.1)' }}>
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  user?.name?.charAt(0).toUpperCase() || "A"
+                )}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize:13, fontWeight:600, color:"var(--white)" }}>{user?.name || "Administrateur"}</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>{user?.email}</div>
+                <div style={{ fontSize:11, color: pathname === "/admin/profile" ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)" }}>{user?.email}</div>
               </div>
             </div>
           </Link>

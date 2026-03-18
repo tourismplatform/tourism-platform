@@ -9,14 +9,19 @@ export class ReviewsService {
   async create(dto: CreateReviewDto, userId: string) {
     const client = this.supabase.getClient();
 
-    const { data: booking } = await client
-      .from('bookings').select('id')
-      .eq('user_id', userId).eq('destination_id', dto.destination_id)
-      .eq('status', 'COMPLETED').single();
+    let query = client.from('bookings').select('id').eq('user_id', userId);
+    
+    if (dto.booking_id) {
+      query = query.eq('id', dto.booking_id);
+    } else {
+      query = query.eq('destination_id', dto.destination_id);
+    }
+    
+    const { data: booking } = await query.eq('status', 'COMPLETED').limit(1).maybeSingle();
 
     if (!booking) {
       throw new BadRequestException(
-        'Vous devez avoir visité cette destination pour laisser un avis',
+        'Vous devez avoir visité cette destination pour laisser un avis (réservation terminée requise)',
       );
     }
 

@@ -17,4 +17,9 @@ export class CreateReviewDto {
   @IsOptional()
   @IsString()
   comment?: string;
+
+  @ApiPropertyOptional({ example: 'uuid-de-la-reservation' })
+  @IsOptional()
+  @IsString()
+  booking_id?: string;
 }

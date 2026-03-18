@@ -113,7 +113,7 @@ export default function MyBookingsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {bookings.map(booking => {
             const status = STATUS_STYLES[booking.status] || STATUS_STYLES.PENDING;
-            const canReview = booking.status === 'CONFIRMED' || booking.status === 'COMPLETED';
+            const canReview = booking.status === 'COMPLETED';
             return (
               <div key={booking.id} style={{ background: 'white', borderRadius: 14, padding: 'clamp(16px, 4vw, 24px)', boxShadow: '0 4px 24px rgba(10,15,30,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>

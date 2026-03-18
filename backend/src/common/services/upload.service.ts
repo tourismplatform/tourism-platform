@@ -18,9 +18,10 @@ export class UploadService {
       throw new BadRequestException('Fichier trop volumineux. Taille maximale: 5MB.');
     }
 
-    // Générer un nom de fichier unique
+    // Générer un nom de fichier unique et nettoyer le nom (enlever espaces et caractères spéciaux)
     const timestamp = Date.now();
-    const uniqueFilename = `avatars/${timestamp}-${filename}`;
+    const sanitizedName = filename.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
+    const uniqueFilename = `avatars/${timestamp}-${sanitizedName}`;
 
     // Upload vers Supabase Storage
     const client = this.supabase.getClient();
@@ -32,7 +33,13 @@ export class UploadService {
       });
 
     if (error) {
-      throw new BadRequestException(`Erreur lors de l'upload: ${error.message}`);
+      let errorMessage = error.message;
+      if (errorMessage.includes('Bucket not found')) {
+        errorMessage = "Le dossier de stockage 'avatars' n'existe pas dans Supabase. Veuillez le créer dans votre tableau de bord Supabase (Storage > New Bucket).";
+      } else if (errorMessage.includes('row-level security policy')) {
+        errorMessage = "Politique de sécurité RLS manquante. Veuillez autoriser l'insertion (INSERT) et la lecture (SELECT) dans le bucket 'avatars' via votre tableau de bord Supabase (Storage > Policies).";
+      }
+      throw new BadRequestException(`Erreur lors de l'upload: ${errorMessage}`);
     }
 
     // Récupérer l'URL publique

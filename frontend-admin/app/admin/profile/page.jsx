@@ -14,7 +14,7 @@ export default function AdminProfilePage() {
   const [saving, setSaving] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [stats, setStats] = useState({ totalDestinations: 0, totalBookings: 0, totalUsers: 0, totalRevenue: 0 });
+  const [showZoom, setShowZoom] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -25,21 +25,7 @@ export default function AdminProfilePage() {
       phone: user?.phone || '' 
     }));
     setAvatarPreview(user?.avatar || null);
-    
-    // Charger les statistiques admin
-    loadAdminStats();
   }, [user]);
-
-  const loadAdminStats = async () => {
-    try {
-      const res = await adminAPI.getStats();
-      if (res?.data) {
-        setStats(res.data);
-      }
-    } catch (error) {
-      console.error('Erreur chargement stats:', error);
-    }
-  };
 
   const handleSave = async () => {
     if (!form.name.trim()) return setMessage({ type: 'error', text: 'Le nom est obligatoire' });
@@ -100,7 +86,8 @@ export default function AdminProfilePage() {
 
   const handleLogout = () => {
     if (logout) logout();
-    window.location.href = "http://localhost:3000/login";
+    const touristeUrl = process.env.NEXT_PUBLIC_TOURISTE_URL || 'http://localhost:3000';
+    window.location.href = `${touristeUrl}/login`;
   };
 
   if (!user) return null;
@@ -109,6 +96,14 @@ export default function AdminProfilePage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', paddingTop: 'clamp(0px, 15vw, 20px)' }}>
+      {/* Petite infusion de CSS pour l'animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 28px)', fontWeight: 700, color: 'var(--gray-900)', marginBottom: 8 }}>
           Mon Profil Administrateur
@@ -128,7 +123,10 @@ export default function AdminProfilePage() {
               <img 
                 src={avatarPreview} 
                 alt="Avatar" 
-                style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '4px solid var(--blue-50)' }}
+                onClick={() => setShowZoom(true)}
+                style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '4px solid var(--blue-50)', cursor: 'zoom-in', transition: 'transform 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               />
             ) : (
               <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'linear-gradient(135deg, var(--blue-600), var(--blue-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 28, border: '4px solid var(--blue-50)' }}>
@@ -252,22 +250,6 @@ export default function AdminProfilePage() {
         )}
       </div>
 
-      {/* Statistiques administrateur */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginBottom: 24 }}>
-        {[
-          { icon: '🗺️', label: 'Destinations', value: stats.totalDestinations || 0, color: '#3b82f6' },
-          { icon: '📅', label: 'Réservations', value: stats.totalBookings || 0, color: '#10b981' },
-          { icon: '👥', label: 'Utilisateurs', value: stats.totalUsers || 0, color: '#f59e0b' },
-          { icon: '💰', label: 'Revenus', value: (stats.totalRevenue || 0).toLocaleString() + ' F', color: '#8b5cf6' },
-        ].map(s => (
-          <div key={s.label} style={{ background: 'white', borderRadius: 16, padding: '24px 20px', boxShadow: 'var(--shadow-sm)', textAlign: 'center', border: '1px solid var(--gray-100)' }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>{s.icon}</div>
-            <div style={{ fontWeight: 800, fontSize: 24, color: 'var(--gray-900)', marginBottom: 4 }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: 'var(--gray-400)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Déconnexion */}
       <div style={{ background: 'white', borderRadius: 16, padding: 24, boxShadow: 'var(--shadow-sm)', border: '1px solid var(--gray-100)' }}>
         <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--gray-900)', marginBottom: 16 }}>Compte & Session</h3>
@@ -278,6 +260,23 @@ export default function AdminProfilePage() {
           🚪 Se déconnecter de l'administration
         </button>
       </div>
+
+      {/* Modal Zoom Image */}
+      {showZoom && avatarPreview && (
+        <div 
+          onClick={() => setShowZoom(false)}
+          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out', backdropFilter: 'blur(4px)', animation: 'fadeIn 0.2s ease-out' }}
+        >
+          <img 
+            src={avatarPreview} 
+            alt="Zoom Avatar" 
+            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: 20, boxShadow: '0 0 40px rgba(0,0,0,0.5)', border: '4px solid white' }} 
+          />
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

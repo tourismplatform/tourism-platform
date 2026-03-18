@@ -7,6 +7,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
+  updateUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -30,6 +31,11 @@ export const useAuthStore = create<AuthState>((set) => {
       Cookies.set('token', token); 
       Cookies.set('user', JSON.stringify(user));
       set({ user, token, isAuthenticated: true });
+    },
+
+    updateUser: (newUser) => {
+      Cookies.set('user', JSON.stringify(newUser));
+      set({ user: newUser });
     },
 
     logout: () => {
