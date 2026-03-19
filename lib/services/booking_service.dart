@@ -3,7 +3,7 @@ import 'api_service.dart';
 
 class BookingService {
   static Future<dynamic> createBooking(Map<String, dynamic> data) async {
-    return await ApiService.post(ApiConstants.bookings, data, auth: true);
+    return await ApiService.post(ApiConstants.bookings, body: data, auth: true);
   }
 
   static Future<List<dynamic>> getMyBookings() async {
@@ -12,6 +12,9 @@ class BookingService {
 
   static Future<dynamic> payBooking(String bookingId) async {
     return await ApiService.post(
-      ApiConstants.payment(bookingId), {}, auth: true);
+      ApiConstants.payment(bookingId),
+      body: {},
+      auth: true,
+    );
   }
 }

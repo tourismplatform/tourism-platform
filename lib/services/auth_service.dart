@@ -6,7 +6,7 @@ class AuthService {
   static Future<bool> login(String email, String password) async {
     final data = await ApiService.post(
       ApiConstants.login,
-      {'email': email, 'password': password},
+      body: {'email': email, 'password': password},
     );
     final token = data['access_token'];
     if (token != null) {
@@ -17,10 +17,14 @@ class AuthService {
     return false;
   }
 
-  static Future<bool> register(String email, String password, String name) async {
+  static Future<bool> register(
+    String email,
+    String password,
+    String name,
+  ) async {
     final data = await ApiService.post(
       ApiConstants.register,
-      {'email': email, 'password': password, 'name': name},
+      body: {'email': email, 'password': password, 'name': name},
     );
     return data != null;
   }

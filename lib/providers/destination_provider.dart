@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
-import '../services/destination_service.dart';
+import '../constants/constants.dart';
+import '../services/api_service.dart';
 
 class DestinationProvider extends ChangeNotifier {
   List<Destination> _destinations = [];
@@ -24,25 +25,28 @@ class DestinationProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      final data = await DestinationService.getDestinations();
-      
-      _destinations = (data as List)
-          .map((json) => Destination.fromJson(json))
-          .toList();
-      
-      if (debugPrint != null) {
-        debugPrint('✅ ${_destinations.length} destinations chargées avec succès.');
-        if (_destinations.isNotEmpty) {
-          debugPrint('   - Première destination: ${_destinations[0].name}');
-          debugPrint('   - Images trouvées: ${_destinations[0].imageUrls.length}');
-        }
+      final json = await ApiService.get(destinationsEndpoint);
+      final data = (json is Map<String, dynamic>) ? json['data'] : null;
+      if (data is List) {
+        _destinations = data
+            .whereType<Map<String, dynamic>>()
+            .map((e) => Destination.fromJson(e))
+            .toList();
+      } else {
+        _destinations = [];
       }
-      
+
+      if (debugPrint != null) {
+        debugPrint(
+          '✅ ${_destinations.length} destinations chargées avec succès.',
+        );
+      }
+
       _filteredDestinations = _destinations;
       _error = null;
     } catch (e) {
       if (debugPrint != null) debugPrint('❌ Erreur DestinationProvider: $e');
-      _error = 'Erreur lors du chargement des destinations';
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();

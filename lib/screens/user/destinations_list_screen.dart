@@ -156,7 +156,10 @@ class _DestinationsListScreenState extends State<DestinationsListScreen> {
                             onTap: () {
                               Navigator.of(context).pushNamed(
                                 '/destination-detail',
-                                arguments: destination.id,
+                                arguments: {
+                                  'id': destination.id,
+                                  'showReservation': false,
+                                },
                               );
                             },
                           );
@@ -175,7 +178,10 @@ class _DestinationsListScreenState extends State<DestinationsListScreen> {
                               onTap: () {
                                 Navigator.of(context).pushNamed(
                                   '/destination-detail',
-                                  arguments: destination.id,
+                                  arguments: {
+                                    'id': destination.id,
+                                    'showReservation': false,
+                                  },
                                 );
                               },
                             ),

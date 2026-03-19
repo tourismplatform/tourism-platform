@@ -428,7 +428,10 @@ class _HomeScreenState extends State<HomeScreen>
         final dest = destinations[index];
         return GestureDetector(
           onTap: () => Navigator.of(context)
-              .pushNamed('/destination-detail', arguments: dest.id),
+              .pushNamed('/destination-detail', arguments: {
+                'id': dest.id,
+                'showReservation': true,
+              }),
           child: Container(
             width: 230,
             margin: const EdgeInsets.only(right: 16, bottom: 4),
@@ -683,7 +686,10 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildModernListCard(Destination dest, BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.of(context)
-          .pushNamed('/destination-detail', arguments: dest.id),
+          .pushNamed('/destination-detail', arguments: {
+            'id': dest.id,
+            'showReservation': true,
+          }),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
@@ -946,7 +952,7 @@ class _HomeScreenState extends State<HomeScreen>
                       controller: scrollController,
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       itemCount: np.notifications.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (context, _) =>
                           const Divider(height: 1, indent: 72),
                       itemBuilder: (context, index) {
                         final notif = np.notifications[index];

@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
-import '../services/booking_service.dart';
+import '../constants/constants.dart';
+import '../services/api_service.dart';
 
 class ReservationProvider extends ChangeNotifier {
   final List<Reservation> _reservations = [];
   bool _isLoading = false;
   String? _error;
 
-  List<Reservation> get reservations => _reservations;
+  // Retourne toutes les réservations (filtrées par userId si fourni)
+  List<Reservation> getReservationsForUser(String userId) {
+    if (userId.isEmpty) return _reservations;
+    return _reservations.where((r) => r.userId == userId).toList();
+  }
+
+  // Getter général (rétro-compatibilité) - retourne toutes les réservations
+  List<Reservation> get reservations => List.unmodifiable(_reservations);
+
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -17,33 +26,63 @@ class ReservationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final List<dynamic> data = await BookingService.getMyBookings();
-      _reservations.clear();
-      _reservations.addAll(data.map((json) => Reservation.fromJson(json)).toList());
-      _error = null;
+      final token = await ApiService.getToken();
+      if (token == null || token.isEmpty) {
+        _reservations.clear();
+        throw Exception('Veuillez vous connecter');
+      }
+      final json = await ApiService.get(bookingsMyEndpoint, token: token);
+      final data = (json is Map<String, dynamic>) ? json['data'] : null;
+      _reservations
+        ..clear()
+        ..addAll(
+          data is List
+              ? data.whereType<Map<String, dynamic>>().map(
+                  (e) => Reservation.fromJson(e),
+                )
+              : const Iterable<Reservation>.empty(),
+        );
     } catch (e) {
-      _error = 'Erreur lors du chargement des réservations : $e';
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> createReservation(Reservation reservation) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
+  Future<Reservation?> createReservation(Reservation reservation) async {
     try {
-      await BookingService.createBooking(reservation.toJson());
-      _reservations.add(reservation);
+      final token = await ApiService.getToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('Veuillez vous connecter');
+      }
+
+      final body = {
+        'destination_id': reservation.destinationId,
+        'check_in': reservation.startDate.toIso8601String(),
+        'check_out': reservation.endDate.toIso8601String(),
+        'nb_persons': reservation.numberOfPeople,
+      };
+
+      final json = await ApiService.post(
+        bookingsEndpoint,
+        token: token,
+        body: body,
+      );
+      final data = (json is Map<String, dynamic>) ? json['data'] : null;
+      if (data is Map<String, dynamic>) {
+        final created = Reservation.fromJson(data);
+        _reservations.insert(0, created);
+        _error = null;
+        return created;
+      }
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors de la création de la réservation : $e';
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
+    return null;
   }
 
   Future<void> updateReservation(String id, ReservationStatus status) async {
@@ -70,7 +109,11 @@ class ReservationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> cancelReservation(String id) async {
-    await updateReservation(id, ReservationStatus.cancelled);
+  Future<bool> cancelReservation(String id) async {
+    // Le backend actuel expose l'annulation uniquement côté admin.
+    // On garde l'UI cohérente et on remonte un message.
+    _error = 'Annulation non disponible pour le moment';
+    notifyListeners();
+    return false;
   }
 }

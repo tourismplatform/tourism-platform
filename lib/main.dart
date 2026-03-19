@@ -22,7 +22,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final p = AuthProvider();
+            p.loadSession();
+            return p;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => DestinationProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
@@ -43,20 +49,35 @@ class MyApp extends StatelessWidget {
               '/': (context) => const SplashScreen(),
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const RegisterScreen(),
-              '/home': (context) => const MainUserScreen(),
+              '/home': (context) {
+                final args = ModalRoute.of(context)?.settings.arguments;
+                int initialTab = 0;
+                int initialReservationTab = 0;
+                if (args is Map<String, dynamic>) {
+                  if (args['tab'] is int) initialTab = args['tab'] as int;
+                  if (args['reservationTab'] is int) initialReservationTab = args['reservationTab'] as int;
+                }
+                return MainUserScreen(initialTab: initialTab, initialReservationTab: initialReservationTab);
+              },
               '/destinations-list': (context) => const DestinationsListScreen(),
               '/destination-detail': (context) {
-                final destinationId = ModalRoute.of(context)!.settings.arguments as String;
-                return DestinationDetailScreen(destinationId: destinationId);
+                final args = ModalRoute.of(context)!.settings.arguments;
+                if (args is Map<String, dynamic>) {
+                  return DestinationDetailScreen(
+                    destinationId: args['id'] as String,
+                    showReservation: args['showReservation'] as bool? ?? true,
+                  );
+                }
+                return DestinationDetailScreen(destinationId: args as String);
               },
               '/reservation': (context) {
                 final destinationId = ModalRoute.of(context)!.settings.arguments as String;
-                return ReservationScreen(destinationId: destinationId);
+                return BookingPage(destinationId: destinationId);
               },
-              '/payment': (context) {
-                final reservationData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-                return PaymentScreen(reservationData: reservationData);
-              },
+              // '/payment': (context) {
+              //   final reservationData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+              //   return PaymentScreen(reservationData: reservationData);
+              // },
               '/my-reservations': (context) => const MyReservationsScreen(),
               '/settings': (context) {
                 final initialTab = ModalRoute.of(context)?.settings.arguments as String?;
@@ -203,20 +224,28 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
 // Écran principal des touristes avec navigation
 class MainUserScreen extends StatefulWidget {
-  const MainUserScreen({super.key});
+  final int initialTab;
+  final int initialReservationTab;
+  const MainUserScreen({super.key, this.initialTab = 0, this.initialReservationTab = 0});
 
   @override
   State<MainUserScreen> createState() => _MainUserScreenState();
 }
 
 class _MainUserScreenState extends State<MainUserScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+  late List<Widget> _screens;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const DestinationsListScreen(),
-    const MyReservationsScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialTab;
+    _screens = [
+      const HomeScreen(),
+      const DestinationsListScreen(),
+      MyReservationsScreen(initialTabIndex: widget.initialReservationTab),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

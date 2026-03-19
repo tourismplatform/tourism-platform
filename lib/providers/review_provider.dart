@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
-import '../services/review_service.dart';
+import '../constants/constants.dart';
 import '../services/api_service.dart';
-import '../constants/api_constants.dart';
-
 
 class ReviewProvider extends ChangeNotifier {
   final List<Review> _reviews = [];
@@ -20,12 +18,20 @@ class ReviewProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final List<dynamic> data = await ApiService.get('${ApiConstants.reviews}?destinationId=$destinationId');
-      _reviews.clear();
-      _reviews.addAll(data.map((json) => Review.fromJson(json)).toList());
+      final json = await ApiService.get('$reviewsEndpoint/$destinationId');
+      final data = (json is Map<String, dynamic>) ? json['data'] : null;
+      _reviews
+        ..clear()
+        ..addAll(
+          data is List
+              ? data.whereType<Map<String, dynamic>>().map(
+                  (e) => Review.fromJson(e),
+                )
+              : const Iterable<Review>.empty(),
+        );
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors du chargement des avis : $e';
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -38,11 +44,29 @@ class ReviewProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await ReviewService.addReview(review.toJson());
-      _reviews.add(review);
+      final token = await ApiService.getToken();
+      if (token == null || token.isEmpty) {
+        throw Exception('Veuillez vous connecter');
+      }
+
+      final json = await ApiService.post(
+        reviewsEndpoint,
+        token: token,
+        body: {
+          'destination_id': review.destinationId,
+          'rating': review.rating,
+          'comment': review.comment,
+        },
+      );
+      final data = (json is Map<String, dynamic>) ? json['data'] : null;
+      if (data is Map<String, dynamic>) {
+        _reviews.insert(0, Review.fromJson(data));
+      } else {
+        _reviews.insert(0, review);
+      }
       _error = null;
     } catch (e) {
-      _error = 'Erreur lors de l\'ajout de l\'avis : $e';
+      _error = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();

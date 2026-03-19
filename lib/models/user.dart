@@ -35,13 +35,30 @@ class User {
   String get fullName => '$firstName $lastName';
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final String? name = json['name'];
+    final String firstName =
+        (json['firstName'] ?? (name?.split(' ').first ?? '')).toString();
+    final String lastName =
+        (json['lastName'] ??
+                (name != null && name.trim().contains(' ')
+                    ? name.trim().split(' ').sublist(1).join(' ')
+                    : ''))
+            .toString();
+
+    final dynamic roleValue = json['role'];
+    final UserRole role = roleValue is String
+        ? (roleValue.toUpperCase() == 'ADMIN'
+              ? UserRole.admin
+              : UserRole.tourist)
+        : UserRole.values[(roleValue ?? 0) as int];
+
     return User(
       id: json['id'] ?? '',
       email: json['email'] ?? '',
-      firstName: json['firstName'] ?? '',
-      lastName: json['lastName'] ?? '',
-      phoneNumber: json['phoneNumber'],
-      role: UserRoleExtension.fromString(json['role'] ?? 'TOURIST'),
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: json['phone'] ?? json['phoneNumber'],
+      role: role,
     );
   }
 

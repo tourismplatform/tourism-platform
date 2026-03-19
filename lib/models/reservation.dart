@@ -1,4 +1,4 @@
-enum ReservationStatus { pending, confirmed, cancelled }
+enum ReservationStatus { pending, confirmed, cancelled, completed }
 
 extension ReservationStatusExtension on ReservationStatus {
   static ReservationStatus fromString(String status) {
@@ -44,21 +44,52 @@ class Reservation {
     required this.createdAt,
   });
 
-  int get numberOfDays => endDate.difference(startDate).inDays;
+  int get numberOfDays =>
+      (endDate.difference(startDate).inDays).abs().clamp(1, 9999);
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
+    final dynamic statusValue = json['status'];
+    final ReservationStatus status = statusValue is String
+        ? () {
+            switch (statusValue.toUpperCase()) {
+              case 'CONFIRMED':
+                return ReservationStatus.confirmed;
+              case 'CANCELLED':
+                return ReservationStatus.cancelled;
+              case 'COMPLETED':
+                return ReservationStatus.completed;
+              case 'PENDING':
+              default:
+                return ReservationStatus.pending;
+            }
+          }()
+        : ReservationStatus.values[(statusValue ?? 0) as int];
+
+    final String destinationName =
+        (json['destinationName'] ??
+                json['destinations']?['name'] ??
+                json['destination']?['name'] ??
+                '')
+            .toString();
+
     return Reservation(
       id: json['id'] ?? '',
-      userId: json['userId'] ?? '',
-      destinationId: json['destinationId'] ?? '',
-      destinationName: json['destinationName'] ?? '',
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
-      numberOfPeople: json['numberOfPeople'] ?? 0,
-      totalPrice: (json['totalPrice'] ?? 0.0).toDouble(),
+      userId: json['user_id'] ?? json['userId'] ?? '',
+      destinationId: json['destination_id'] ?? json['destinationId'] ?? '',
+      destinationName: destinationName,
+      startDate: DateTime.parse(
+        (json['check_in'] ?? json['startDate']).toString(),
+      ),
+      endDate: DateTime.parse(
+        (json['check_out'] ?? json['endDate']).toString(),
+      ),
+      numberOfPeople: json['nb_persons'] ?? json['numberOfPeople'] ?? 0,
+      totalPrice: (json['total_price'] ?? json['totalPrice'] ?? 0.0).toDouble(),
       comment: json['comment'],
-      status: ReservationStatusExtension.fromString(json['status'] ?? 'PENDING'),
-      createdAt: DateTime.parse(json['createdAt']),
+      status: status,
+      createdAt: DateTime.parse(
+        (json['created_at'] ?? json['createdAt']).toString(),
+      ),
     );
   }
 
