@@ -6,12 +6,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth';
 import { useCurrencyStore } from '@/lib/currency';
+import { useTranslation } from '@/lib/i18n';
 import api from '@/lib/api';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated, logout, login, updateUser } = useAuthStore();
   const { formatPrice } = useCurrencyStore();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [bookings, setBookings] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
@@ -117,12 +119,12 @@ export default function ProfilePage() {
         }
       `}</style>
 
-      <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', fontWeight: 700, marginBottom: 32, color: '#0a0f1e' }}>
-        Mon Profil
+      <h1 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', fontWeight: 700, marginBottom: 32, color: 'var(--dark)' }}>
+        {t('my_profile_title')}
       </h1>
 
       {/* Carte profil */}
-      <div style={{ background: 'white', borderRadius: 16, padding: 'clamp(20px, 5vw, 32px)', boxShadow: '0 4px 24px rgba(10,15,30,0.08)', marginBottom: 20 }}>
+      <div style={{ background: 'var(--white)', borderRadius: 16, padding: 'clamp(20px, 5vw, 32px)', boxShadow: '0 4px 24px rgba(10,15,30,0.08)', marginBottom: 20, border: '1px solid var(--border)' }}>
 
         {/* Avatar + infos */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 28, flexWrap: 'wrap' }}>
@@ -141,7 +143,7 @@ export default function ProfilePage() {
                 {initials}
               </div>
             )}
-            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: -2, right: -2, background: '#1a4fd6', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid white' }}>
+            <label htmlFor="avatar-upload" style={{ position: 'absolute', bottom: -2, right: -2, background: 'var(--primary)', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--white)' }}>
               <span style={{ color: 'white', fontSize: '12px' }}>📷</span>
             </label>
             <input
@@ -154,18 +156,18 @@ export default function ProfilePage() {
             />
           </div>
           <div style={{ flex: '1 1 200px' }}>
-            <div style={{ fontWeight: 700, fontSize: '1.2rem', color: '#0a0f1e' }}>{user?.name}</div>
-            <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 6 }}>{user?.email}</div>
+            <div style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--dark)' }}>{user?.name}</div>
+            <div style={{ color: 'var(--gray)', fontSize: '0.9rem', marginBottom: 6 }}>{user?.email}</div>
             {user?.phone && (
-              <div style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 6 }}>📞 {user.phone}</div>
+              <div style={{ color: 'var(--gray)', fontSize: '0.9rem', marginBottom: 6 }}>📞 {user.phone}</div>
             )}
-            <span style={{ background: '#eff6ff', color: '#1a4fd6', padding: '2px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>
-              {user?.role === 'ADMIN' ? '👑 Administrateur' : '🧭 Touriste'}
+            <span style={{ background: 'rgba(26, 79, 214, 0.1)', color: 'var(--primary)', padding: '2px 12px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 700 }}>
+              {user?.role === 'ADMIN' ? t('admin_role') : t('tourist_role')}
             </span>
           </div>
           <button onClick={() => { setEditing(!editing); setMessage(null); }}
-            style={{ background: editing ? '#f4f6fa' : '#1a4fd6', color: editing ? '#6b7280' : 'white', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', maxWidth: 'none', flex: '1 1 auto' }} className="md:w-auto">
-            {editing ? 'Annuler' : '✏️ Modifier mon profil'}
+            style={{ background: editing ? 'var(--light-gray)' : 'var(--primary)', color: editing ? 'var(--gray)' : 'white', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', width: '100%', maxWidth: 'none', flex: '1 1 auto' }} className="md:w-auto">
+            {editing ? t('cancel') : t('edit_profile')}
           </button>
         </div>
 
@@ -180,43 +182,43 @@ export default function ProfilePage() {
         {editing ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 6 }}>Nom complet</label>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'var(--gray)', marginBottom: 6 }}>Nom complet</label>
               <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                style={{ width: '100%', border: '1.5px solid var(--border)', background: 'var(--white)', color: 'var(--dark)', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 6 }}>Téléphone</label>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'var(--gray)', marginBottom: 6 }}>Téléphone</label>
               <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+226 00 00 00 00"
-                style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                style={{ width: '100%', border: '1.5px solid var(--border)', background: 'var(--white)', color: 'var(--dark)', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
-            <div style={{ borderTop: '1px solid #f4f6fa', paddingTop: 16 }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280', marginBottom: 16 }}>Sécurité (optionnel)</div>
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'var(--gray)', marginBottom: 16 }}>{t('security_title')}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <input type="password" placeholder="Mot de passe actuel" value={form.currentPassword} onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
-                <input type="password" placeholder="Nouveau mot de passe" value={form.newPassword} onChange={e => setForm(f => ({ ...f, newPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
-                <input type="password" placeholder="Confirmez le nouveau mot de passe" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                  style={{ width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                <input type="password" placeholder={t('current_password')} value={form.currentPassword} onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))}
+                  style={{ width: '100%', border: '1.5px solid var(--border)', background: 'var(--white)', color: 'var(--dark)', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                <input type="password" placeholder={t('new_password')} value={form.newPassword} onChange={e => setForm(f => ({ ...f, newPassword: e.target.value }))}
+                  style={{ width: '100%', border: '1.5px solid var(--border)', background: 'var(--white)', color: 'var(--dark)', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+                <input type="password" placeholder={t('confirm_password')} value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                  style={{ width: '100%', border: '1.5px solid var(--border)', background: 'var(--white)', color: 'var(--dark)', borderRadius: 10, padding: '12px 14px', fontSize: '0.92rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
               </div>
             </div>
             <button onClick={handleSave} disabled={saving}
-              style={{ background: saving ? '#93c5fd' : '#1a4fd6', color: 'white', border: 'none', borderRadius: 10, padding: '14px', fontWeight: 600, fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', marginTop: 8 }}>
-              {saving ? 'Enregistrement...' : '💾 Sauvegarder les modifications'}
+              style={{ background: saving ? 'var(--gray)' : 'var(--primary)', color: 'white', border: 'none', borderRadius: 10, padding: '14px', fontWeight: 600, fontSize: '0.95rem', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', marginTop: 8 }}>
+              {saving ? t('saving_changes') : t('save_changes')}
             </button>
           </div>
         ) : (
           <div>
             {[
-              { label: 'Nom complet', value: user?.name },
-              { label: 'Email', value: user?.email },
-              { label: 'Téléphone', value: user?.phone || 'Non renseigné' },
-              { label: 'Rôle', value: user?.role },
+              { label: t('full_name'), value: user?.name },
+              { label: t('email_label'), value: user?.email },
+              { label: t('phone_label'), value: user?.phone || t('not_provided') },
+              { label: t('role_label'), value: user?.role === 'ADMIN' ? t('admin_role') : t('tourist_role') },
             ].map(item => (
-              <div key={item.label} style={{ borderBottom: '1px solid #f4f6fa', padding: '14px 0', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: '#6b7280' }}>{item.label}</span>
-                <span style={{ fontSize: '0.9rem', color: '#0a0f1e', fontWeight: 500 }}>{item.value}</span>
+              <div key={item.label} style={{ borderBottom: '1px solid var(--border)', padding: '14px 0', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', color: 'var(--gray)' }}>{item.label}</span>
+                <span style={{ fontSize: '0.9rem', color: 'var(--dark)', fontWeight: 500 }}>{item.value}</span>
               </div>
             ))}
           </div>
@@ -231,23 +233,23 @@ export default function ProfilePage() {
         marginBottom: 24 
       }}>
         {[
-          { icon: '📅', label: 'Réservations', value: stats.total },
-          { icon: '✅', label: 'Confirmées', value: stats.confirmed },
-          { icon: '🏁', label: 'Terminées', value: stats.completed },
-          { icon: '💰', label: 'Total dépensé', value: formatPrice(stats.spent) },
+          { icon: '📅', label: t('stats_bookings'), value: stats.total },
+          { icon: '✅', label: t('stats_confirmed'), value: stats.confirmed },
+          { icon: '🏁', label: t('stats_completed'), value: stats.completed },
+          { icon: '💰', label: t('stats_spent'), value: formatPrice(stats.spent) },
         ].map(s => (
-          <div key={s.label} style={{ background: 'white', borderRadius: 12, padding: '20px 12px', boxShadow: '0 4px 24px rgba(10,15,30,0.06)', textAlign: 'center' }}>
+          <div key={s.label} style={{ background: 'var(--white)', borderRadius: 12, padding: '20px 12px', boxShadow: '0 4px 24px rgba(10,15,30,0.06)', textAlign: 'center', border: '1px solid var(--border)' }}>
             <div style={{ fontSize: '1.4rem', marginBottom: 6 }}>{s.icon}</div>
-            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#0a0f1e', marginBottom: 2 }}>{s.value}</div>
-            <div style={{ fontSize: '0.72rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{s.label}</div>
+            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--dark)', marginBottom: 2 }}>{s.value}</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--gray)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Déconnexion */}
       <button onClick={() => { logout(); router.push('/'); }}
-        style={{ width: '100%', background: 'white', border: '1.5px solid #ef4444', color: '#ef4444', borderRadius: 10, padding: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.92rem' }}>
-        🚪 Se déconnecter
+        style={{ width: '100%', background: 'var(--white)', border: '1.5px solid #ef4444', color: '#ef4444', borderRadius: 10, padding: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.92rem' }}>
+        {t('logout_btn')}
       </button>
 
       {/* Modal Zoom Image */}
@@ -259,9 +261,9 @@ export default function ProfilePage() {
           <img 
             src={avatarPreview} 
             alt="Zoom Avatar" 
-            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: 20, boxShadow: '0 0 40px rgba(0,0,0,0.5)', border: '4px solid white' }} 
+            style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: 20, boxShadow: '0 0 40px rgba(0,0,0,0.5)', border: '4px solid var(--white)' }} 
           />
-          <button style={{ position: 'absolute', top: 20, right: 20, background: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'var(--white)', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.3)', color: 'var(--dark)' }}>
             ✕
           </button>
         </div>

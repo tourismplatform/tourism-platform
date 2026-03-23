@@ -13,11 +13,23 @@
   --white: #ffffff;
 }
 
+.dark {
+  --primary: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --accent: #ff7043;
+  --dark: #f8fafc;
+  --gray: #94a3b8;
+  --light-gray: #0f172a;
+  --border: #334155;
+  --white: #1e293b;
+}
+
 body {
   font-family: var(--font-outfit), 'Outfit', sans-serif;
   background: var(--light-gray);
   color: var(--dark);
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .font-display {
@@ -47,7 +59,7 @@ body {
 }
 
 .mobile-only {
-  display: none;
+  display: none !important;
 }
 
 .desktop-only {

@@ -4,6 +4,12 @@ import { persist } from 'zustand/middleware';
 
 export type CurrencyCode = 'XOF' | 'EUR' | 'USD';
 
+export const CURRENCIES: { code: CurrencyCode; label: string; flag: string }[] = [
+  { code: 'XOF', label: 'Franc CFA (BCEAO)', flag: '🇧🇫' },
+  { code: 'EUR', label: 'Euro', flag: '🇪🇺' },
+  { code: 'USD', label: 'Dollar Américain', flag: '🇺🇸' },
+];
+
 interface CurrencyState {
   currency: CurrencyCode;
   setCurrency: (code: CurrencyCode) => void;

@@ -52,15 +52,15 @@ export default function RegisterPage() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, background: '#f4f6fa' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, background: 'var(--light-gray)' }}>
       <div style={{ width: '100%', maxWidth: 440 }}>
 
         <Link href="/" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.6rem', fontWeight: 700, color: '#1a4fd6', textDecoration: 'none', display: 'block', marginBottom: 32 }}>
           Tourism<span style={{ color: '#ff5722' }}>BF</span>
         </Link>
 
-        <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 6, color: '#0a0f1e' }}>Créer un compte</h2>
-        <p style={{ color: '#6b7280', marginBottom: 32, fontSize: '0.9rem' }}>Rejoignez TourismBF gratuitement !</p>
+        <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 6, color: 'var(--dark)' }}>Créer un compte</h2>
+        <p style={{ color: 'var(--gray)', marginBottom: 32, fontSize: '0.9rem' }}>Rejoignez TourismBF gratuitement !</p>
 
         {errors.global && (
           <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, color: '#ef4444', fontSize: '0.88rem' }}>
@@ -71,13 +71,13 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {fields.map(f => (
             <div key={f.key}>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6, color: '#0a0f1e' }}>{f.label}</label>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6, color: 'var(--dark)' }}>{f.label}</label>
               <input
                 type={f.type}
                 placeholder={f.placeholder}
                 value={form[f.key as keyof typeof form]}
                 onChange={e => setForm({ ...form, [f.key]: e.target.value })}
-                style={{ width: '100%', border: `1.5px solid ${errors[f.key] ? '#ef4444' : '#e5e7eb'}`, borderRadius: 10, padding: '11px 14px', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', background: 'white', boxSizing: 'border-box' }}
+                style={{ width: '100%', border: `1.5px solid ${errors[f.key] ? '#ef4444' : 'var(--border)'}`, borderRadius: 10, padding: '11px 14px', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', background: 'var(--white)', color: 'var(--dark)', boxSizing: 'border-box' }}
               />
               {errors[f.key] && <p style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: 4 }}>{errors[f.key]}</p>}
             </div>

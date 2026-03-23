@@ -63,14 +63,14 @@ window.location.href = `${adminUrl}/admin?token=${token}&user=${encodeURICompone
       </div>
 
       {/* PANNEAU DROIT */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, background: '#f4f6fa' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, background: 'var(--light-gray)' }}>
         <div style={{ width: '100%', maxWidth: 440 }}>
           <Link href="/" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.6rem', fontWeight: 700, color: '#1a4fd6', textDecoration: 'none', display: 'block', marginBottom: 32 }}>
             Tourism<span style={{ color: '#ff5722' }}>BF</span>
           </Link>
 
-          <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 6, color: '#0a0f1e' }}>Connexion</h2>
-          <p style={{ color: '#6b7280', marginBottom: 32, fontSize: '0.9rem' }}>Bienvenue ! Entrez vos identifiants.</p>
+          <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 700, marginBottom: 6, color: 'var(--dark)' }}>Connexion</h2>
+          <p style={{ color: 'var(--gray)', marginBottom: 32, fontSize: '0.9rem' }}>Bienvenue ! Entrez vos identifiants.</p>
 
           {errors.global && (
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 16, color: '#ef4444', fontSize: '0.88rem' }}>
@@ -80,16 +80,16 @@ window.location.href = `${adminUrl}/admin?token=${token}&user=${encodeURICompone
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6, color: '#0a0f1e' }}>Email</label>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6, color: 'var(--dark)' }}>Email</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="votre@email.com"
-                style={{ width: '100%', border: `1.5px solid ${errors.email ? '#ef4444' : '#e5e7eb'}`, borderRadius: 10, padding: '11px 14px', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', background: 'white', boxSizing: 'border-box' }} />
+                style={{ width: '100%', border: `1.5px solid ${errors.email ? '#ef4444' : 'var(--border)'}`, borderRadius: 10, padding: '11px 14px', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', background: 'var(--white)', color: 'var(--dark)', boxSizing: 'border-box' }} />
               {errors.email && <p style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: 4 }}>{errors.email}</p>}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6, color: '#0a0f1e' }}>Mot de passe</label>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 6, color: 'var(--dark)' }}>Mot de passe</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
-                style={{ width: '100%', border: `1.5px solid ${errors.password ? '#ef4444' : '#e5e7eb'}`, borderRadius: 10, padding: '11px 14px', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', background: 'white', boxSizing: 'border-box' }} />
+                style={{ width: '100%', border: `1.5px solid ${errors.password ? '#ef4444' : 'var(--border)'}`, borderRadius: 10, padding: '11px 14px', fontSize: '0.92rem', fontFamily: 'var(--font-outfit), sans-serif', outline: 'none', background: 'var(--white)', color: 'var(--dark)', boxSizing: 'border-box' }} />
               {errors.password && <p style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: 4 }}>{errors.password}</p>}
             </div>
 
