@@ -53,7 +53,7 @@ export default function HomePage() {
         {/* Pattern de fond */}
         <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto' }}>
+        <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto', width: '100%' }}>
           {/* Tag */}
           <div style={{ display: 'inline-block', background: 'rgba(255,87,34,0.2)', color: '#ff8a65', border: '1px solid rgba(255,87,34,0.3)', padding: '6px 16px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 600, marginBottom: 20, letterSpacing: '0.5px' }}>
             🌍 {t('official_platform')}
@@ -70,7 +70,7 @@ export default function HomePage() {
           {/* Barre de recherche */}
           <div suppressHydrationWarning style={{ 
             background: 'var(--white)', borderRadius: 14, padding: '8px', display: 'flex', 
-            flexWrap: 'wrap', alignItems: 'center', gap: 10, maxWidth: 600, 
+            flexWrap: 'wrap', alignItems: 'center', gap: 10, maxWidth: 600, width: '100%',
             boxShadow: '0 8px 40px rgba(0,0,0,0.3)', border: '1px solid var(--border)'
           }}>
             <input
@@ -79,14 +79,13 @@ export default function HomePage() {
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
               placeholder={t('search_placeholder')}
-              style={{ flex: 1, minWidth: 200, border: 'none', outline: 'none', fontSize: '0.95rem', color: 'var(--dark)', fontFamily: 'var(--font-outfit), sans-serif', background: 'transparent', paddingLeft: 12 }}
+              style={{ flex: '1 1 200px', border: 'none', outline: 'none', fontSize: '0.95rem', color: 'var(--dark)', fontFamily: 'var(--font-outfit), sans-serif', background: 'transparent', padding: '12px' }}
             />
             <button onClick={handleSearch} style={{ 
               background: '#1a4fd6', color: 'white', border: 'none', padding: '12px 24px', 
               borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: '0.92rem', 
-              fontFamily: 'var(--font-outfit), sans-serif', width: '100%', maxWidth: 'none',
-              flex: '1 1 auto'
-            }} className="md:w-auto">
+              fontFamily: 'var(--font-outfit), sans-serif', flex: '1 0 auto'
+            }}>
               {t('search_button')}
             </button>
           </div>

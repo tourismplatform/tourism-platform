@@ -52,7 +52,7 @@ window.location.href = `${adminUrl}/admin?token=${token}&user=${encodeURICompone
   return (
     <div style={{ minHeight: '100vh', display: 'flex' }}>
       {/* PANNEAU GAUCHE */}
-      <div style={{ display: 'none', width: '50%', background: 'linear-gradient(135deg, #0a0f1e, #1a4fd6)', alignItems: 'center', justifyContent: 'center', padding: 60, flexDirection: 'column', gap: 40 }} className="lg-flex">
+      <div style={{ width: '50%', background: 'linear-gradient(135deg, #0a0f1e, #1a4fd6)', alignItems: 'center', justifyContent: 'center', padding: 60, flexDirection: 'column', gap: 40 }} className="desktop-only">
         <div style={{ color: 'white', textAlign: 'left' }}>
           <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.6rem', fontWeight: 700, marginBottom: 40, color: '#ff5722' }}>TourismBF</div>
           <h2 style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.8rem', fontWeight: 700, lineHeight: 1.2, marginBottom: 16 }}>
@@ -63,7 +63,7 @@ window.location.href = `${adminUrl}/admin?token=${token}&user=${encodeURICompone
       </div>
 
       {/* PANNEAU DROIT */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, background: 'var(--light-gray)' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px, 5vw, 40px)', background: 'var(--light-gray)', width: '100%' }}>
         <div style={{ width: '100%', maxWidth: 440 }}>
           <Link href="/" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.6rem', fontWeight: 700, color: '#1a4fd6', textDecoration: 'none', display: 'block', marginBottom: 32 }}>
             Tourism<span style={{ color: '#ff5722' }}>BF</span>

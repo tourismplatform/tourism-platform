@@ -57,13 +57,13 @@ const Footer = () => {
   return (
     <footer style={{ background: 'var(--white)', borderTop: '1px solid var(--border)', paddingTop: 60, paddingBottom: 40, marginTop: 80 }}>
       {/* Footer Content */}
-      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 32, marginBottom: 60 }}>
+      <div className="container" style={{ margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '32px 16px', marginBottom: 60 }}>
           {footerSections.map((section) => (
             <div key={section.title}>
               <h4 style={{ fontSize: 13, fontWeight: 700, color: 'var(--dark)', marginBottom: 18, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{section.title}</h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {footerSections.find(s => s.title === section.title)?.links.map((link) => (
+                {section.links.map((link) => (
                   <li key={link.label} style={{ marginBottom: 12 }}>
                     <Link href={link.href} style={{ fontSize: 13, color: 'var(--primary)', textDecoration: 'none', transition: 'all 0.2s', borderBottom: '1px solid transparent' }}>
                        {link.label}
@@ -78,7 +78,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 32 }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
-            <div style={{ flex: '1 1 300px' }}>
+            <div style={{ flex: '1 1 250px' }}>
                 <div style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.6rem', fontWeight: 700, color: 'var(--primary)', marginBottom: 12 }}>
                     Tourism<span style={{ color: 'var(--accent)' }}>BF</span>
                 </div>
@@ -91,7 +91,7 @@ const Footer = () => {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                 {/* Partner Logos Style branding */}
-                <div style={{ display: 'flex', gap: 24, opacity: 0.5, filter: 'grayscale(1)' }}>
+                <div style={{ display: 'flex', gap: 24, opacity: 0.5, filter: 'grayscale(1)', flexWrap: 'wrap' }}>
                    <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--dark)', letterSpacing: '-1px' }}>Tourism</span>
                    <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--dark)', letterSpacing: '-1px' }}>Heritage</span>
                    <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--dark)', letterSpacing: '-1px' }}>Agoda</span>

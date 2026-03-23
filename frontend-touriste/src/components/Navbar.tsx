@@ -36,85 +36,85 @@ export default function Navbar() {
       height: 64, 
       display: 'flex', 
       alignItems: 'center', 
-      justifyContent: 'space-between', 
-      padding: '0 20px', 
       position: 'sticky', 
       top: 0, 
       zIndex: 100, 
-      boxShadow: '0 1px 12px rgba(0,0,0,0.06)' 
+      boxShadow: '0 1px 12px rgba(0,0,0,0.06)',
+      width: '100%'
     }}>
-      
-      {/* LOGO */}
-      <Link 
-        href="/" 
-        onClick={() => setIsOpen(false)}
-        style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-      >
-        Tourism<span style={{ color: 'var(--accent)' }}>BF</span>
-      </Link>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* BOUTONS MOBILE QUICK TOOLS */}
-        <div className="mobile-only" style={{ gap: 8, marginRight: 8, alignItems: 'center' }}>
-            <button onClick={toggleTheme} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', padding: 4 }}>
-                {mounted && theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
-            </button>
-        </div>
-
-        {/* BOUTON MENU MOBILE */}
-        <button 
-          onClick={() => setIsOpen(!isOpen)} 
-          className="mobile-only" 
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: 4 }}
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        {/* LOGO */}
+        <Link 
+          href="/" 
+          onClick={() => setIsOpen(false)}
+          style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
         >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
+          Tourism<span style={{ color: 'var(--accent)' }}>BF</span>
+        </Link>
 
-      {/* LIENS DESKTOP */}
-      <div className="desktop-only" style={{ alignItems: 'center', gap: 8 }}>
-        <Link href="/" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none' }}>{t('home')}</Link>
-        <Link href="/destinations" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none' }}>{t('destinations')}</Link>
-        {mounted && isAuthenticated && (
-          <Link href="/my-bookings" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none' }}>{t('my_bookings')}</Link>
-        )}
-
-        {/* TOOLS */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 16, paddingLeft: 16, borderLeft: '1px solid var(--border)' }}>
-            <button onClick={toggleLang} title="Changer de langue" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: 'var(--gray)', fontSize: '0.8rem', fontWeight: 700 }}>
-                <Globe size={16} /> {lang}
-            </button>
-
-            <button onClick={toggleTheme} title="Changer de thème" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', display: 'flex', alignItems: 'center' }}>
-                {mounted && theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
-
-            <button onClick={() => setIsCurrencyModalOpen(true)} title="Changer de devise" style={{ background: 'var(--light-gray)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: '0.82rem', color: 'var(--dark)' }}>
-                <span>{currentCurrency?.flag}</span>
-                <span>{currency}</span>
-            </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* BOUTONS MOBILE QUICK TOOLS */}
+          <div className="mobile-only">
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+               <button onClick={toggleTheme} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', padding: 4 }}>
+                  {mounted && theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
+               </button>
+               {/* BOUTON MENU MOBILE */}
+               <button 
+                 onClick={() => setIsOpen(!isOpen)} 
+                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: 4 }}
+               >
+                 {isOpen ? <X size={28} /> : <Menu size={28} />}
+               </button>
+            </div>
+          </div>
         </div>
 
-        <div style={{ marginLeft: 8, display: 'flex', gap: 8 }}>
-          {mounted && (
-            isAuthenticated ? (
-              <div
-                onClick={() => router.push('/profile')}
-                style={{ width: 38, height: 38, background: 'linear-gradient(135deg, var(--primary), var(--accent))', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', overflow: 'hidden', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-              >
-                {user?.avatar ? (
-                  <img src={user.avatar} alt={user?.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  user?.name?.charAt(0).toUpperCase()
-                )}
-              </div>
-            ) : (
-              <>
-                <Link href="/login" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--primary)', border: '1.5px solid var(--primary)', textDecoration: 'none' }}>{t('login')}</Link>
-                <Link href="/register" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'white', background: 'var(--primary)', textDecoration: 'none' }}>{t('register')}</Link>
-              </>
-            )
+        {/* LIENS DESKTOP */}
+        <div className="desktop-only" style={{ alignItems: 'center', gap: 8 }}>
+          <Link href="/" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none' }}>{t('home')}</Link>
+          <Link href="/destinations" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none' }}>{t('destinations')}</Link>
+          {mounted && isAuthenticated && (
+            <Link href="/my-bookings" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none' }}>{t('my_bookings')}</Link>
           )}
+
+          {/* TOOLS */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 16, paddingLeft: 16, borderLeft: '1px solid var(--border)' }}>
+              <button onClick={toggleLang} title="Changer de langue" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: 'var(--gray)', fontSize: '0.8rem', fontWeight: 700 }}>
+                  <Globe size={16} /> {lang}
+              </button>
+
+              <button onClick={toggleTheme} title="Changer de thème" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', display: 'flex', alignItems: 'center' }}>
+                  {mounted && theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              </button>
+
+              <button onClick={() => setIsCurrencyModalOpen(true)} title="Changer de devise" style={{ background: 'var(--light-gray)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 800, fontSize: '0.82rem', color: 'var(--dark)' }}>
+                  <span>{currentCurrency?.flag}</span>
+                  <span>{currency}</span>
+              </button>
+          </div>
+
+          <div style={{ marginLeft: 8, display: 'flex', gap: 8 }}>
+            {mounted && (
+              isAuthenticated ? (
+                <div
+                  onClick={() => router.push('/profile')}
+                  style={{ width: 38, height: 38, background: 'linear-gradient(135deg, var(--primary), var(--accent))', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', overflow: 'hidden', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                >
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user?.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    user?.name?.charAt(0).toUpperCase()
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link href="/login" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--primary)', border: '1.5px solid var(--primary)', textDecoration: 'none' }}>{t('login')}</Link>
+                  <Link href="/register" style={{ padding: '8px 18px', borderRadius: 8, fontSize: '0.88rem', fontWeight: 600, color: 'white', background: 'var(--primary)', textDecoration: 'none' }}>{t('register')}</Link>
+                </>
+              )
+            )}
+          </div>
         </div>
       </div>
 
@@ -144,12 +144,15 @@ export default function Navbar() {
           )}
 
           {/* MOBILE TOOLS */}
-          <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+          <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
             <button onClick={() => setIsCurrencyModalOpen(true)} style={{ flex: 1, padding: 14, borderRadius: 12, background: 'var(--light-gray)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 700, color: 'var(--dark)' }}>
                 {currentCurrency?.flag} {currency}
             </button>
-            <button onClick={toggleLang} style={{ padding: 14, borderRadius: 12, background: 'var(--light-gray)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, color: 'var(--dark)' }}>
+            <button onClick={toggleLang} style={{ flex: 1, padding: 14, borderRadius: 12, background: 'var(--light-gray)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 700, color: 'var(--dark)' }}>
                 <Globe size={20} /> {lang}
+            </button>
+            <button onClick={toggleTheme} style={{ flex: 1, padding: 14, borderRadius: 12, background: 'var(--light-gray)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 700, color: 'var(--dark)' }}>
+                {mounted && theme === 'light' ? <><Moon size={20} /> Mode sombre</> : <><Sun size={20} /> Mode clair</>}
             </button>
           </div>
         </div>
